@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+    <title>My Page</title>
+    <meta name="viewport" content="width=device-width">
+	<meta charset='utf-8'>
+    <script src='file:///android_asset/app.js'></script>
+    <script src="Misc/jquery-3.1.1.js"></script>
+</head>
+<script>
+    $(document).ready(function() {
+        var curfile = window.location.href;
+        var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
+        var file = curdir + '/Html/tables.xml';
+        $('#content').children('div').click(function(){
+            ix = $(this).index();
+            switch (ix) { 
+	            case 0:
+            		if ( ! app.FileExists(file) ) {
+            			app.ShowPopup('É preciso actualizar');
+            		} else {
+		                window.location.href = "Html/01.html";
+            		}
+		            break;
+	            case 1:
+            		if ( ! app.FileExists(file) ) {
+            			app.ShowPopup('É preciso actualizar');
+            		} else {
+    		            window.location.href = "Html/02.html";
+            		}
+		            break;
+	            case 2: 
+		            window.location.href = "Html/03.html";
+		            break;
+	            case 3: 
+		            window.location.href = "Html/04.html";
+		            break;
+            	default:
+		            alert('nenhuma escolha');
+            }
+        });
+    });
+</script>
+<style>
+	body {
+	    background-color: #ffffff;
+	}
+	div {
+	    width:100%;
+	    float:left;
+	}
+	#logo {
+        height:80px;
+	    background-image:url('Img/Emblem_of_Mozambique.jpg');
+	    background-repeat:no-repeat;
+	    background-position:center;
+	    background-size:contain;
+	}
+	#header {
+	    text-align:center;
+	}
+	#content {
+	    margin-bottom:40px;
+	}
+	#content > div {
+	    width:20%;
+	    margin-left: 40%;
+	    border: solid 1px black;
+	    border-radius:6px;
+	    background-color:lightgrey;
+	    text-align:center;
+	    padding:8px;
+	    margin-top:10px;
+	}
+	#content > div:hover {
+	    background-color:red;
+	    color:white;
+	    cursor:pointer;
+	}
+	#footer {
+        height:80px;
+	    background-image:url('Img/cdc_jembi_UEM_Moasis.png');
+	    background-repeat:no-repeat;
+	    background-position:center;
+	    background-size:contain;
+	}
+</style>
+<body>
+    <div id="page">
+ 
+        <div id="logo">
+        </div>
+ 
+        <div id="header">
+            <h1>SARA</h1>
+            <h2>Moçambique</h2>
+            <h3>Service Availability and Readiness Assessment</h3>
+        </div>
+ 
+        <div id="content">
+            <div>Entrada<br />auto</div>
+            <div>Entrada<br />manual</div>
+            <div>Actualiza<br />servidor</div>
+            <div>Guia do<br />usuário</div>
+        </div>
+ 
+        <div id="footer">
+        </div>
+ 
+    </div>
+</body>
+</html>

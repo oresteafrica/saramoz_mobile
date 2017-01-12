@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+    <title>SARA</title>
+    <meta name="viewport" content="width=device-width">
+	<meta charset='utf-8'>
+    <script src='file:///android_asset/app.js'></script>
+    <script src="../Misc/jquery-3.1.1.js"></script>
+</head>
+<script>
+    $(document).ready(function() {
+
+        var curfile = window.location.href;
+        var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
+		var file = curdir + '/tables.xml';
+		var server_php = 'http://sis-ma.in/sara/php/';
+
+        $('#voltar').click(function(){
+            window.location.href = "../saramoz.html";
+        });
+        $('#continuar').click(function(){ 
+            window.location.href = "../saramoz.html";
+        });
+
+		get_tables(server_php,file);
+
+		function get_tables(server_php,file) {
+    		$.ajax({
+				url: server_php + 'sara_tables_to_xml.php',
+        		data: { user: 'unknown' },
+				type: 'GET',
+				dataType: 'html',
+				beforeSend: function(a){  },
+				success: function(a){
+					$('#continuar').prop('disabled',false);
+					$('#msg').css('color', '#006400');
+					$('#msg').text('Dispositivo actualizado');
+					app.WriteFile(file,a,"utf-8");
+        		},
+				error: function(a,b,c){ },
+				complete: function(a,b){ $('#voltar').prop('disabled',false); }
+			});
+		}
+
+
+    });
+</script>
+<style>
+	body {
+	    background-color:white;
+	}
+	div {
+	    float:left;
+	    width:100%;
+        margin-bottom:20px;
+        font-size:xx-small;
+	}
+	#msg {
+		color:red;
+	}
+</style>
+<body>
+    <div>
+        <button id="voltar" disabled="disabled">Voltar</button>
+        <button id="continuar" disabled="disabled">Continuar</button>
+		<h3 id="msg">Estou em espera da resposta do servidor</h3>
+    </div>
+    <div id="res">
+    </div>
+</body>
+</html>

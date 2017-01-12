@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+    <title>SARA</title>
+    <meta name="viewport" content="width=device-width">
+	<meta charset='utf-8'>
+    <script src='file:///android_asset/app.js'></script>
+    <script src="../Misc/jquery-3.1.1.js"></script>
+</head>
+<script>
+    $(document).ready(function() {
+		var mac = app.GetMacAddress();
+		$('#mac').val(mac);
+		model = app.GetModel();
+		$('#model').val(model);
+        $('#voltar').click(function(){
+            window.location.href = "../saramoz.html";
+        });
+        $('#credenciar').click(function(){ 
+            alert('trabalho em curso'); 
+            window.location.href = "../saramoz.html";
+        });
+    });
+</script>
+<style>
+	body {
+	    background-color:Ivory;
+	}
+	div {
+	    float:left;
+	    width:100%;
+        margin-bottom:20px;
+        font-size:small;
+	}
+</style>
+<body>
+    <div>
+        <button id="voltar">Voltar</button>
+        <button id="continuar">Continuar</button>
+    </div>
+    <div class="inform" id="form_user">
+		<p>As informações devem ser as mesmas gravadas no servidor para que a credencial possa ser aceite</p>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Nome completo</td>
+                </tr>
+                <tr>
+                    <td><input type="text" id="user_01"></td>
+                </tr>
+                <tr>
+                    <td>Endereço email</td>
+                </tr>
+                <tr>
+                    <td><input type="text" id="user_02"></td>
+                </tr>
+                <tr>
+                    <td>Número do celular</td>
+                </tr>
+                <tr>
+                    <td><input type="text" id="user_03"></td>
+                </tr>
+                <tr>
+                    <td>Senha</td>
+                </tr>
+                <tr>
+                    <td><input type="password" id="user_04"></td>
+                </tr>
+                <tr>
+                    <td>Endereço MAC</td>
+                </tr>
+                <tr>
+                    <td><input type="text" id="mac" readonly="readonly"></td>
+                </tr>
+                <tr>
+                    <td>Id do aparelho</td>
+                </tr>
+                <tr>
+                    <td><input type="text" id="model" readonly="readonly"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <button id="credenciar">Credenciar os dados</button>
+</body>
+</html>
