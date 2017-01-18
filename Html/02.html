@@ -6,21 +6,90 @@
 	<meta charset='utf-8'>
     <script src='file:///android_asset/app.js'></script>
     <script src="../Misc/jquery-3.1.1.js"></script>
+    <script src="../Misc/XORCipher.js"></script>
 </head>
 <script>
     $(document).ready(function() {
+        var curfile = window.location.href;
+        var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
+		var fileUser = curdir + '/user.xml';
+		var server_php = 'http://sis-ma.in/sara/php/';
 		var mac = app.GetMacAddress();
 		$('#mac').val(mac);
-		model = app.GetModel();
+		var model = app.GetModel();
 		$('#model').val(model);
+		if (app.FileExists(fileUser)) {
+			var xmlUser = app.ReadFile(fileUser,"UTF-8");
+			var user = $.parseXML(xmlUser);
+			var local_no = $(user).children().find('name').text();
+			var local_em = $(user).children().find('email').text();
+			var local_ce = $(user).children().find('cell').text();
+			var local_se = XORCipher.decode('saracrypt', $(user).children().find('pass').text());
+			$('#curr_user').text(local_no);
+			$('#form_curr_user').show();
+		} else {
+			$('#form_user').show();
+		}
+//----------------------------------------------------------------------------------------------------------------------
         $('#voltar').click(function(){
             window.location.href = "../saramoz.html";
         });
+//----------------------------------------------------------------------------------------------------------------------
         $('#credenciar').click(function(){ 
             alert('trabalho em curso'); 
             window.location.href = "../saramoz.html";
+			var no = $('#user_01').val(); // nome completo
+			var em = $('#user_02').val(); // email
+			var ce = $('#user_03').val(); // número celular
+			var se = $('#user_04').val(); // senha
+			var today = new Date();
+			var dd = today.getDate();
+			var mm = today.getMonth()+1; //January is 0!
+			var yyyy = today.getFullYear();
+			if(dd<10) { dd='0'+dd } 
+			if(mm<10) { mm='0'+mm } 
+			var da = mm+dd+yyyy;
+
+	    	$.ajax({
+				url: server_php + 'sara_login.php',
+        		data: { no: no, em: em, ce: ce, se: se },
+				type: 'GET',
+				dataType: 'html',
+				beforeSend: function(a){  },
+				success: function(a){
+					if (isNaN(a)) { alert('Problemas com a conexão Internet, tente mais tarde.'); return; }
+					var mid = parseInt(a);
+					if (mid > 0) {
+						var xmlUser = '<?xml version="1.0" encoding="UTF-8"?>';
+						xmlUser += '<user>';
+						xmlUser += '<name>'+no+'</name>';
+						xmlUser += '<email>'+em+'</email>';
+						xmlUser += '<cell>'+ce+'</cell>';
+						xmlUser += '<pass>' + XORCipher.encode('saracrypt', se) + '</pass>';
+						xmlUser += '<date>'+da+'</date>';
+						xmlUser += '</user>';
+						app.WriteFile(fileUser,xmlUser,"UTF-8");
+						app.SaveNumber( 'auth', 1 );
+					} else {
+						alert('O usuário não é cadastrado. Contacte o administrador de rede.');
+			            window.location.href = "../saramoz.html";
+					}
+        		},
+				error: function(a,b,c){ },
+				complete: function(a,b){  }
+			});
+
         });
-    });
+//----------------------------------------------------------------------------------------------------------------------
+        $('#login').click(function(){ 
+			if ( $('#user_senha').val() == local_se ) {
+				app.SaveNumber( 'auth', 1 );
+				alert('O usuário é cadastrado. Pode continuar o seu trabalho.');
+			    window.location.href = "../saramoz.html";
+			}
+        });
+//----------------------------------------------------------------------------------------------------------------------
+   });
 </script>
 <style>
 	body {
@@ -32,11 +101,19 @@
         margin-bottom:20px;
         font-size:small;
 	}
+	.inform {
+		display:none;
+	}
+	.bu_cre {
+        margin-top:20px;
+	}
+	#curr_user {
+		font-weight:bold;
+	}
 </style>
 <body>
     <div>
         <button id="voltar">Voltar</button>
-        <button id="continuar">Continuar</button>
     </div>
     <div class="inform" id="form_user">
 		<p>As informações devem ser as mesmas gravadas no servidor para que a credencial possa ser aceite</p>
@@ -80,7 +157,22 @@
                 </tr>
             </tbody>
         </table>
+    <button class="bu_cre" id="credenciar">Credenciar</button>
     </div>
-    <button id="credenciar">Credenciar os dados</button>
+    <div class="inform" id="form_curr_user">
+		<p>Usuário corrente:</p>
+		<p id="curr_user"></p>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Senha</td>
+                </tr>
+                <tr>
+                    <td><input type="password" id="user_senha"></td>
+                </tr>
+            </tbody>
+        </table>
+    <button class="bu_cre" id="login">Login</button>
+    </div>
 </body>
 </html>

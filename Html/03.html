@@ -9,7 +9,11 @@
 </head>
 <script>
     $(document).ready(function() {
-
+		var auth = app.LoadNumber( 'auth', 0 );
+		if ( auth != 1 ) {
+			alert('O usuário não é cadastrado');
+		    window.location.href = "../saramoz.html";
+		}
         var curfile = window.location.href;
         var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
 		var file = curdir + '/tables.xml';

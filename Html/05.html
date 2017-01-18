@@ -13,37 +13,42 @@
         var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
 		var file = curdir + '/tables.xml';
 		var latlon_file = curdir + '/latlon.xml';
-
-        $('#voltar').click(function(){
-            window.location.href = "../saramoz.html";
-        });
-
-        $('#gravar').click(function(){
-	        var curfile = window.location.href;
-    	    var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
-			var form_main_file = curdir + '/form_main.xml';
-			var second_trs = $('#form_elements > table > tbody > tr:odd');
-			var res = '<?xml version="1.0" encoding="UTF-8"?><form_main>';
-			var debug_ele
-			second_trs.each(function(){
-				var ele = $(this).children().eq(0).children().eq(0);
-				res += '<row><id>' + $(ele).prop('id') + '</id><value>' + $(ele).val() + '</value></row>';
-	        });
-			res += '</form_main>';
-			app.WriteFile(form_main_file,res,"utf-8");
-			//send_main_form_to_server(server_php,form_main_file);
-			alert('O formulário foi gravado, será enviado para o servidor');
-            window.location.href = "../saramoz.html";
-        });
-
 		inject_sel(file, 'unit_type', 'mz012');
 		inject_sel(file, 'unit_authority', 'mz013');
 		inject_sel(file, 'ministries', 'mz014');
 		inject_sel(file, 'unit_state', 'mz015');
 		inject_sel(file, 'unit_service', 'mz023');
-
 		inject_latlon(latlon_file);
 
+//----------------------------------------------------------------------------------------------------------------------
+        $('#voltar').click(function(){
+            window.location.href = "../saramoz.html";
+        });
+//----------------------------------------------------------------------------------------------------------------------
+        $('#gravar').click(function(){
+			var auth = app.LoadNumber( 'auth', 0 );
+			if ( auth != 1 ) {
+				alert('O usuário não é cadastrado');
+			    window.location.href = "../saramoz.html";
+			} else {
+		        var curfile = window.location.href;
+	    	    var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
+				var form_main_file = curdir + '/form_main.xml';
+				var second_trs = $('#form_elements > table > tbody > tr:odd');
+				var res = '<?xml version="1.0" encoding="UTF-8"?><form_main>';
+				var debug_ele
+				second_trs.each(function(){
+					var ele = $(this).children().eq(0).children().eq(0);
+					res += '<row><id>' + $(ele).prop('id') + '</id><value>' + $(ele).val() + '</value></row>';
+		        });
+				res += '</form_main>';
+				app.WriteFile(form_main_file,res,"utf-8");
+				//send_main_form_to_server(server_php,form_main_file);
+				alert('O formulário foi gravado, será enviado para o servidor');
+    	        window.location.href = "../saramoz.html";
+			}
+        });
+//----------------------------------------------------------------------------------------------------------------------
 		function send_main_form_to_server(server_php,form_main_file) {
 			// serialize data from xml
     		$.ajax({
@@ -58,7 +63,7 @@
 				complete: function(a,b){ }
 			});
 		}
-
+//----------------------------------------------------------------------------------------------------------------------
 		function inject_sel(file, tabname, idsel) {
 			var xml_string = app.ReadFile(file);
 			var xml = $.parseXML(xml_string);
@@ -80,7 +85,7 @@
             })
 			$('#'+idsel).html(options);
 		}
-
+//----------------------------------------------------------------------------------------------------------------------
 		function inject_latlon(latlon_file) {
 			var xml_string = app.ReadFile(latlon_file);
 			var xml = $.parseXML(xml_string);
@@ -101,6 +106,7 @@
 		}
 
     });
+//----------------------------------------------------------------------------------------------------------------------
 </script>
 <style>
 	body {
