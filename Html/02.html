@@ -6,7 +6,6 @@
 	<meta charset='utf-8'>
     <script src='file:///android_asset/app.js'></script>
     <script src="../Misc/jquery-3.1.1.js"></script>
-    <script src="../Misc/XORCipher.js"></script>
 </head>
 <script>
     $(document).ready(function() {
@@ -18,15 +17,17 @@
 		$('#mac').val(mac);
 		var model = app.GetModel();
 		$('#model').val(model);
+		var auth = 0;
+		if (compare_today_with_stored_date()) {
+			auth = app.LoadNumber( 'auth', 0 );
+		}
 		if (app.FileExists(fileUser)) {
 			var xmlUser = app.ReadFile(fileUser,"UTF-8");
 			var user = $.parseXML(xmlUser);
+			var local_id = $(user).children().find('id').text();
 			var local_no = $(user).children().find('name').text();
-			var local_em = $(user).children().find('email').text();
-			var local_ce = $(user).children().find('cell').text();
-			var local_se = XORCipher.decode('saracrypt', $(user).children().find('pass').text());
-			$('#curr_user').text(local_no);
-			$('#form_curr_user').show();
+			$('.curr_user').text(local_no+' ('+local_id+')');
+			if ( auth == 1 ) { $('#info_curr_user').show(); } else { $('#form_curr_user').show(); }
 		} else {
 			$('#form_user').show();
 		}
@@ -36,8 +37,6 @@
         });
 //----------------------------------------------------------------------------------------------------------------------
         $('#credenciar').click(function(){ 
-            alert('trabalho em curso'); 
-            window.location.href = "../saramoz.html";
 			var no = $('#user_01').val(); // nome completo
 			var em = $('#user_02').val(); // email
 			var ce = $('#user_03').val(); // número celular
@@ -49,10 +48,10 @@
 			if(dd<10) { dd='0'+dd } 
 			if(mm<10) { mm='0'+mm } 
 			var da = mm+dd+yyyy;
-
+			var wo = (Math.random() + 1).toString(36).substring(2, 5);
+			var url = server_php + 'sara_login.php?no='+no+'&em='+em+'&ce='+ce+'&se='+se+'&wo='+wo;
 	    	$.ajax({
-				url: server_php + 'sara_login.php',
-        		data: { no: no, em: em, ce: ce, se: se },
+				url: url,
 				type: 'GET',
 				dataType: 'html',
 				beforeSend: function(a){  },
@@ -62,32 +61,122 @@
 					if (mid > 0) {
 						var xmlUser = '<?xml version="1.0" encoding="UTF-8"?>';
 						xmlUser += '<user>';
+						xmlUser += '<id>'+mid+'</id>';
 						xmlUser += '<name>'+no+'</name>';
 						xmlUser += '<email>'+em+'</email>';
 						xmlUser += '<cell>'+ce+'</cell>';
-						xmlUser += '<pass>' + XORCipher.encode('saracrypt', se) + '</pass>';
+						xmlUser += '<pass>'+se+'</pass>';
 						xmlUser += '<date>'+da+'</date>';
 						xmlUser += '</user>';
 						app.WriteFile(fileUser,xmlUser,"UTF-8");
 						app.SaveNumber( 'auth', 1 );
+						alert('Cadastramento efectuado com sucesso');
+			            window.location.href = "../saramoz.html";
 					} else {
 						alert('O usuário não é cadastrado. Contacte o administrador de rede.');
 			            window.location.href = "../saramoz.html";
 					}
         		},
-				error: function(a,b,c){ },
+				error: function(a,b,c){ alert('Problemas com a conexão Internet, tente mais tarde.'); return; },
 				complete: function(a,b){  }
 			});
 
         });
 //----------------------------------------------------------------------------------------------------------------------
         $('#login').click(function(){ 
+			var local_se = '';
+			if (app.FileExists(fileUser)) {
+				var xmlUser = app.ReadFile(fileUser,"UTF-8");
+				var user = $.parseXML(xmlUser);
+				local_se = $(user).children().find('pass').text();
+			} else {
+				alert('Login impossível. Tente cadastrar novamente.');
+			    window.location.href = "../saramoz.html";
+				return;
+			}
 			if ( $('#user_senha').val() == local_se ) {
 				app.SaveNumber( 'auth', 1 );
+				if ( attrib_today_date_to_user_file() != 1) {
+					alert('Login impossível. Tente cadastrar novamente.');
+				    window.location.href = "../saramoz.html";
+					return;
+				}
 				alert('O usuário é cadastrado. Pode continuar o seu trabalho.');
+			    window.location.href = "../saramoz.html";
+			} else {
+				alert('Login não correto');
 			    window.location.href = "../saramoz.html";
 			}
         });
+//----------------------------------------------------------------------------------------------------------------------
+        $('#outro').click(function(){
+			app.DeleteFile( fileUser );
+			app.SaveNumber( 'auth', 0 );
+			alert('O usuário corrente foi apagado, pode cadastrar outro usuário.');
+			window.location.href = "../saramoz.html";
+
+        });
+//----------------------------------------------------------------------------------------------------------------------
+		function attrib_today_date_to_user_file() {
+			var curdir = app.GetAppPath();
+			var fileUser = curdir + '/Html/user.xml';
+			var local_id = '';
+			var local_no = '';
+			var local_em = '';
+			var local_ce = '';
+			var local_se = '';
+			var local_da = '';
+			var today = new Date();
+			var dd = today.getDate();
+			var mm = today.getMonth()+1; //January is 0!
+			var yyyy = today.getFullYear();
+			if(dd<10) { dd='0'+dd } 
+			if(mm<10) { mm='0'+mm } 
+			var da = mm+dd+yyyy;
+			if (app.FileExists(fileUser)) {
+				var xmlUser_old = app.ReadFile(fileUser,"UTF-8");
+				var user = $.parseXML(xmlUser_old);
+				local_id = $(user).children().find('id').text();
+				local_no = $(user).children().find('name').text();
+				local_em = $(user).children().find('email').text();
+				local_ce = $(user).children().find('cell').text();
+				local_se = $(user).children().find('pass').text();
+				app.DeleteFile( fileUser );
+				var xmlUser = '<?xml version="1.0" encoding="UTF-8"?>';
+				xmlUser += '<user>';
+				xmlUser += '<id>'+local_id+'</id>';
+				xmlUser += '<name>'+local_no+'</name>';
+				xmlUser += '<email>'+local_em+'</email>';
+				xmlUser += '<cell>'+local_ce+'</cell>';
+				xmlUser += '<pass>'+local_se+'</pass>';
+				xmlUser += '<date>'+da+'</date>';
+				xmlUser += '</user>';
+				app.WriteFile(fileUser,xmlUser,"UTF-8");
+			} else {
+				return 0;
+			}
+			return 1;
+		}
+//----------------------------------------------------------------------------------------------------------------------
+		function compare_today_with_stored_date() {
+			var curdir = app.GetAppPath();
+			var fileUser = curdir + '/Html/user.xml';
+			if (! app.FileExists(fileUser)) { return 0; }
+			var today = new Date();
+			var dd = parseInt(today.getDate());
+			var mm = parseInt(today.getMonth());
+			var yyyy = parseInt(today.getFullYear());
+			var today_no_time = new Date(yyyy,mm,dd);
+			var xmlUser = app.ReadFile(fileUser,"UTF-8");
+			var user = $.parseXML(xmlUser);
+			var local_date_string = $(user).children().find('date').text();
+			var local_yyyy = parseInt(local_date_string.substr(4,4));
+			var local_mm = parseInt(local_date_string.substr(0,2) - 1);
+			var local_dd = parseInt(local_date_string.substr(2,2));
+			var local_date_no_time = new Date(local_yyyy,local_mm,local_dd);
+			if (local_date_no_time.getTime() != today_no_time.getTime()) { return 0; }
+			return 1;
+		}
 //----------------------------------------------------------------------------------------------------------------------
    });
 </script>
@@ -107,7 +196,7 @@
 	.bu_cre {
         margin-top:20px;
 	}
-	#curr_user {
+	.curr_user {
 		font-weight:bold;
 	}
 </style>
@@ -129,13 +218,13 @@
                     <td>Endereço email</td>
                 </tr>
                 <tr>
-                    <td><input type="text" id="user_02"></td>
+                    <td><input type="email" id="user_02"></td>
                 </tr>
                 <tr>
                     <td>Número do celular</td>
                 </tr>
                 <tr>
-                    <td><input type="text" id="user_03"></td>
+                    <td><input type="number" id="user_03"></td>
                 </tr>
                 <tr>
                     <td>Senha</td>
@@ -161,7 +250,7 @@
     </div>
     <div class="inform" id="form_curr_user">
 		<p>Usuário corrente:</p>
-		<p id="curr_user"></p>
+		<p class="curr_user"></p>
         <table>
             <tbody>
                 <tr>
@@ -173,6 +262,13 @@
             </tbody>
         </table>
     <button class="bu_cre" id="login">Login</button>
+    <button class="bu_cre" id="outro">Outro usuário</button>
+    </div>
+    <div class="inform" id="info_curr_user">
+		<p>Usuário corrente:</p>
+		<p class="curr_user"></p>
+        </table>
+    <button class="bu_cre" id="outro">Apagar usuário corrente</button>
     </div>
 </body>
 </html>

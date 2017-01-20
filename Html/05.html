@@ -9,6 +9,11 @@
 </head>
 <script>
     $(document).ready(function() {
+		var auth = app.LoadNumber( 'auth', 0 );
+		if ( auth != 1 ) {
+			alert('O usuário não é cadastrado');
+			window.location.href = "../saramoz.html";
+		}
         var curfile = window.location.href;
         var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
 		var file = curdir + '/tables.xml';
@@ -21,32 +26,26 @@
 		inject_latlon(latlon_file);
 
 //----------------------------------------------------------------------------------------------------------------------
-        $('#voltar').click(function(){
+        $('.voltar').click(function(){
             window.location.href = "../saramoz.html";
         });
 //----------------------------------------------------------------------------------------------------------------------
         $('#gravar').click(function(){
-			var auth = app.LoadNumber( 'auth', 0 );
-			if ( auth != 1 ) {
-				alert('O usuário não é cadastrado');
-			    window.location.href = "../saramoz.html";
-			} else {
-		        var curfile = window.location.href;
-	    	    var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
-				var form_main_file = curdir + '/form_main.xml';
-				var second_trs = $('#form_elements > table > tbody > tr:odd');
-				var res = '<?xml version="1.0" encoding="UTF-8"?><form_main>';
-				var debug_ele
-				second_trs.each(function(){
-					var ele = $(this).children().eq(0).children().eq(0);
-					res += '<row><id>' + $(ele).prop('id') + '</id><value>' + $(ele).val() + '</value></row>';
-		        });
-				res += '</form_main>';
-				app.WriteFile(form_main_file,res,"utf-8");
-				//send_main_form_to_server(server_php,form_main_file);
-				alert('O formulário foi gravado, será enviado para o servidor');
-    	        window.location.href = "../saramoz.html";
-			}
+		    var curfile = window.location.href;
+	    	var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
+			var form_main_file = curdir + '/form_main.xml';
+			var second_trs = $('#form_elements > table > tbody > tr:odd');
+			var res = '<?xml version="1.0" encoding="UTF-8"?><form_main>';
+			var debug_ele
+			second_trs.each(function(){
+				var ele = $(this).children().eq(0).children().eq(0);
+				res += '<row><id>' + $(ele).prop('id') + '</id><value>' + $(ele).val() + '</value></row>';
+		    });
+			res += '</form_main>';
+			app.WriteFile(form_main_file,res,"utf-8");
+			//send_main_form_to_server(server_php,form_main_file);
+			alert('O formulário foi gravado, será enviado para o servidor');
+    	    window.location.href = "../saramoz.html";
         });
 //----------------------------------------------------------------------------------------------------------------------
 		function send_main_form_to_server(server_php,form_main_file) {
@@ -135,10 +134,13 @@
     select {
         font-size:x-small;
     }
+	button {
+		margin-right:8px;
+	}
 </style>
 <body>
     <div>
-        <button id="voltar">Voltar sem gravar</button>
+        <button class="voltar">Voltar sem gravar</button>
     </div>
     <div class="inform" id="form_elements">
         <table>
@@ -328,6 +330,7 @@
             </tbody>
         </table>
         <button id="gravar">Gravar os dados</button>
+        <button class="voltar">Voltar sem gravar</button>
     </div>
 </body>
 </html>
