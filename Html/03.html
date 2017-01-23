@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>SARA</title>
+    <title>Actualiza servidor</title>
     <meta name="viewport" content="width=device-width">
 	<meta charset='utf-8'>
     <script src='file:///android_asset/app.js'></script>
@@ -14,38 +14,79 @@
 			alert('O usuário não é cadastrado');
 		    window.location.href = "../saramoz.html";
 		}
-        var curfile = window.location.href;
-        var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
-		var file = curdir + '/tables.xml';
+		var curdir = app.GetAppPath();
 		var server_php = 'http://sis-ma.in/sara/php/';
+		var fileTables = curdir + '/Html/tables.xml';
+		var fileForm1 = curdir + '/Html/form_main.xml';
+		//var url1 = server_php + 'sara_tables_to_xml.php';
+		//var ajax1 = get_tables(url1, fileTables);
+		var url2 = server_php + 'sara_from_xml_to_field1.php';
+		//var ajax2 = send_form(url2,fileForm1);
 
+send_form(url2,fileForm1);
+
+/*
+		// https://medium.com/coding-design/writing-better-ajax-8ee4a7fb95f#.qnqc51f9x
+		$.when(ajax1, ajax2).done(function() {
+			$('#voltar').prop('disabled',false);
+			$('#msg').css('color', '#006400');
+			$('#msg').text('Dispositivo actualizado');
+
+			$('#res').append('(ajax1, ajax2).done');
+
+		}).fail(function() {
+
+			$('#res').append('(ajax1, ajax2).fail');
+
+		});
+*/
+
+
+//----------------------------------------------------------------------------------------------------------------------
         $('#voltar').click(function(){
             window.location.href = "../saramoz.html";
         });
-        $('#continuar').click(function(){ 
-            window.location.href = "../saramoz.html";
-        });
-
-		get_tables(server_php,file);
-
-		function get_tables(server_php,file) {
+//----------------------------------------------------------------------------------------------------------------------
+		function get_tables(url,file) {
     		$.ajax({
-				url: server_php + 'sara_tables_to_xml.php',
-        		data: { user: 'unknown' },
+				url: url,
 				type: 'GET',
 				dataType: 'html',
 				beforeSend: function(a){  },
 				success: function(a){
-					$('#continuar').prop('disabled',false);
-					$('#msg').css('color', '#006400');
-					$('#msg').text('Dispositivo actualizado');
 					app.WriteFile(file,a,"utf-8");
         		},
 				error: function(a,b,c){ },
-				complete: function(a,b){ $('#voltar').prop('disabled',false); }
+				complete: function(a,b){ }
 			});
 		}
+//----------------------------------------------------------------------------------------------------------------------
+		function send_form(url,file) {
+			if (! app.FileExists(file)) { return false; }
+			var xmlForm1 = app.ReadFile(file,"UTF-8");
+			var xml = $.parseXML(xmlForm1);
+			var	rows = $(xml).children().find('row');
+			var data = [];
+			rows.each(function(ind,ele){
+				data.push($(ele).find('id').text()+'='+$(ele).find('value').text());
+			});
+			var datastring = '?' + data.join('&');
+    		$.ajax({
+				url: url + datastring,
+				type: 'GET',
+				dataType: 'html',
+				beforeSend: function(a){  },
+				success: function(a){
+					app.DeleteFile(file);
+        		},
+				error: function(a,b,c){ },
+				complete: function(a,b){ }
+			});
 
+
+
+		}
+//----------------------------------------------------------------------------------------------------------------------
 
     });
 </script>
@@ -66,7 +107,6 @@
 <body>
     <div>
         <button id="voltar" disabled="disabled">Voltar</button>
-        <button id="continuar" disabled="disabled">Continuar</button>
 		<h3 id="msg">Estou em espera da resposta do servidor</h3>
     </div>
     <div id="res">
