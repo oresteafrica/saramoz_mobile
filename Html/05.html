@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>SARA</title>
+    <title>Form1</title>
     <meta name="viewport" content="width=device-width">
 	<meta charset='utf-8'>
     <script src='file:///android_asset/app.js'></script>
@@ -14,16 +14,32 @@
 			alert('O usuário não é cadastrado');
 			window.location.href = "../saramoz.html";
 		}
-        var curfile = window.location.href;
-        var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
-		var file = curdir + '/tables.xml';
-		var latlon_file = curdir + '/latlon.xml';
-		inject_sel(file, 'unit_type', 'mz012');
-		inject_sel(file, 'unit_authority', 'mz013');
-		inject_sel(file, 'ministries', 'mz014');
-		inject_sel(file, 'unit_state', 'mz015');
-		inject_sel(file, 'unit_service', 'mz023');
-		inject_latlon(latlon_file);
+		var curdir = app.GetAppPath();
+		var file = curdir + '/Html/tables.xml';
+		var latlon_file = curdir + '/Html/latlon.xml';
+		var form_main_file = curdir + '/Html/form_main.xml';
+
+
+		if (app.FileExists(form_main_file)) {
+			var xmlForm1 = app.ReadFile(form_main_file,"UTF-8");
+			var xml = $.parseXML(xmlForm1);
+			var	rows = $(xml).children().find('row');
+			var field;
+			var value;
+			rows.each(function(ind,ele){
+				field = $(ele).find('id').text();
+				value = $(ele).find('value').text();
+				$('#'+field).val(value);
+			});
+		} else {
+			inject_sel(file, 'unit_type', 'mz012');
+			inject_sel(file, 'unit_authority', 'mz013');
+			inject_sel(file, 'ministries', 'mz014');
+			inject_sel(file, 'unit_state', 'mz015');
+			inject_sel(file, 'unit_service', 'mz023');
+			inject_latlon(latlon_file);
+		}
+
 
 //----------------------------------------------------------------------------------------------------------------------
         $('.voltar').click(function(){
@@ -31,38 +47,39 @@
         });
 //----------------------------------------------------------------------------------------------------------------------
         $('#gravar').click(function(){
-		    var curfile = window.location.href;
-	    	var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
-			var form_main_file = curdir + '/form_main.xml';
-			var second_trs = $('#form_elements > table > tbody > tr:odd');
+			var curdir = app.GetAppPath();
+			var form_main_file = curdir + '/Html/form_main.xml';
+			var fileUser = curdir + '/Html/user.xml';
+			var today = new Date();
+			var dd = today.getDate();
+			var mm = today.getMonth()+1; //January is 0!
+			var yyyy = today.getFullYear();
+			var mysql_today = yyyy + '-' + mm + '-' + dd;
+			if (app.FileExists(fileUser)) {
+				var xmlUser = app.ReadFile(fileUser,"UTF-8");
+				var user = $.parseXML(xmlUser);
+				var local_id = $(user).children().find('id').text();
+			} else {
+				alert('O usuário não é cadastrado. Deve efectuar login.');
+				return;
+			}
 			var res = '<?xml version="1.0" encoding="UTF-8"?><form_main>';
-			var debug_ele
+			res += '<row><id>op_id</id><value>' + local_id + '</value></row>';
+			res += '<row><id>in_date</id><value>' + mysql_today + '</value></row>';
+			var second_trs = $('#form_elements > table > tbody > tr:odd');
 			second_trs.each(function(){
 				var ele = $(this).children().eq(0).children().eq(0);
 				res += '<row><id>' + $(ele).prop('id') + '</id><value>' + $(ele).val() + '</value></row>';
 		    });
 			res += '</form_main>';
 			app.WriteFile(form_main_file,res,"utf-8");
-			//send_main_form_to_server(server_php,form_main_file);
-			alert('O formulário foi gravado, será enviado para o servidor');
+			alert('O formulário foi gravado na base de dados local. Actualize o servidor para enviar ao servidor remoto.');
     	    window.location.href = "../saramoz.html";
         });
 //----------------------------------------------------------------------------------------------------------------------
-		function send_main_form_to_server(server_php,form_main_file) {
-			// serialize data from xml
-    		$.ajax({
-				url: server_php + 'sara_store_main_form.php',
-        		data: {  },
-				type: 'GET',
-				dataType: 'html',
-				beforeSend: function(a){  },
-				success: function(a){
-        		},
-				error: function(a,b,c){ },
-				complete: function(a,b){ }
-			});
-		}
-//----------------------------------------------------------------------------------------------------------------------
+
+// aggiungere un parametro che indichi il valore di default !
+
 		function inject_sel(file, tabname, idsel) {
 			var xml_string = app.ReadFile(file);
 			var xml = $.parseXML(xml_string);

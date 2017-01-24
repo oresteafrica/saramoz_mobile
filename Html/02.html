@@ -9,9 +9,8 @@
 </head>
 <script>
     $(document).ready(function() {
-        var curfile = window.location.href;
-        var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
-		var fileUser = curdir + '/user.xml';
+		var curdir = app.GetAppPath();
+		var fileUser = curdir + '/Html/user.xml';
 		var server_php = 'http://sis-ma.in/sara/php/';
 		var mac = app.GetMacAddress();
 		$('#mac').val(mac);

@@ -10,7 +10,7 @@
 <script>
     $(document).ready(function() {
 		var auth = app.LoadNumber( 'auth', 0 );
-		if ( auth != 1 ) {
+		if ( auth == 0 ) {
 			alert('O usuário não é cadastrado');
 		    window.location.href = "../saramoz.html";
 		}
@@ -18,29 +18,17 @@
 		var server_php = 'http://sis-ma.in/sara/php/';
 		var fileTables = curdir + '/Html/tables.xml';
 		var fileForm1 = curdir + '/Html/form_main.xml';
-		//var url1 = server_php + 'sara_tables_to_xml.php';
-		//var ajax1 = get_tables(url1, fileTables);
-		var url2 = server_php + 'sara_from_xml_to_field1.php';
-		//var ajax2 = send_form(url2,fileForm1);
+		var url1 = server_php + 'sara_tables_to_xml.php';
+		var ajax1 = get_tables(url1, fileTables);
+		var url2 = server_php + 'sara_from_http_to_field1.php';
+		var ajax2 = send_form(url2,fileForm1);
 
-send_form(url2,fileForm1);
-
-/*
 		// https://medium.com/coding-design/writing-better-ajax-8ee4a7fb95f#.qnqc51f9x
 		$.when(ajax1, ajax2).done(function() {
 			$('#voltar').prop('disabled',false);
-			$('#msg').css('color', '#006400');
-			$('#msg').text('Dispositivo actualizado');
-
-			$('#res').append('(ajax1, ajax2).done');
-
 		}).fail(function() {
-
-			$('#res').append('(ajax1, ajax2).fail');
-
+			$('#res').append('Houve problemas de conexão, tente mais tarde.');
 		});
-*/
-
 
 //----------------------------------------------------------------------------------------------------------------------
         $('#voltar').click(function(){
@@ -55,6 +43,7 @@ send_form(url2,fileForm1);
 				beforeSend: function(a){  },
 				success: function(a){
 					app.WriteFile(file,a,"utf-8");
+					$('#msg1').text('Tabelas locais actualizadas');
         		},
 				error: function(a,b,c){ },
 				complete: function(a,b){ }
@@ -77,14 +66,16 @@ send_form(url2,fileForm1);
 				dataType: 'html',
 				beforeSend: function(a){  },
 				success: function(a){
-					app.DeleteFile(file);
+					if (a == 'OK') {
+						app.DeleteFile(file);
+						$('#msg2').text('Ficha enviada para o servidor');
+					} else {
+						$('#res').append('Houve problemas de conexão, tente mais tarde.');
+					}
         		},
 				error: function(a,b,c){ },
 				complete: function(a,b){ }
 			});
-
-
-
 		}
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -100,14 +91,15 @@ send_form(url2,fileForm1);
         margin-bottom:20px;
         font-size:xx-small;
 	}
-	#msg {
+	.msg {
 		color:red;
 	}
 </style>
 <body>
     <div>
         <button id="voltar" disabled="disabled">Voltar</button>
-		<h3 id="msg">Estou em espera da resposta do servidor</h3>
+		<h3 class="msg" id="msg1">Aguardo a recepção de tabelas do servidor</h3>
+		<h3 class="msg" id="msg2">Aguardo o envio da ficha ao servidor</h3>
     </div>
     <div id="res">
     </div>

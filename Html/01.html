@@ -10,7 +10,14 @@
 </head>
 <script>
     $(document).ready(function() {
-        init();
+
+		var curdir = app.GetAppPath();
+		var form_main_file = curdir + '/Html/form_main.xml';
+		if (app.FileExists(form_main_file)) {
+	        window.location.href = '../Html/05.html';
+		} else {
+	        init();
+		}
 //----------------------------------------------------------------------------------------------------------------------
         $('#voltar').click(function(){ end('../saramoz.html'); });
 //----------------------------------------------------------------------------------------------------------------------
