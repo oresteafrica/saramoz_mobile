@@ -15,10 +15,9 @@
 			window.location.href = "../saramoz.html";
 		}
 		var curdir = app.GetAppPath();
-		var file = curdir + '/Html/tables.xml';
+		var fileTabsXml = curdir + '/Html/tables.xml';
 		var latlon_file = curdir + '/Html/latlon.xml';
 		var form_main_file = curdir + '/Html/form_main.xml';
-
 
 		if (app.FileExists(form_main_file)) {
 			var xmlForm1 = app.ReadFile(form_main_file,"UTF-8");
@@ -29,14 +28,31 @@
 			rows.each(function(ind,ele){
 				field = $(ele).find('id').text();
 				value = $(ele).find('value').text();
-				$('#'+field).val(value);
+				switch (field) {
+					case 'mz006': // select províncias
+						$('#'+field).find('option[value= "'+value+'"]').attr('selected',true);
+					case 'mz012': // select
+						inject_sel(fileTabsXml, 'unit_type', 'mz012', value);
+					case 'mz013': // select
+						inject_sel(fileTabsXml, 'unit_authority', 'mz013', value);
+					case 'mz014': // select
+						inject_sel(fileTabsXml, 'ministries', 'mz014', value);
+					case 'mz015': // select
+						inject_sel(fileTabsXml, 'unit_state', 'mz015', value);
+					case 'mz023': // select
+						inject_sel(fileTabsXml, 'unit_service', 'mz023', value);
+					case 'mz022': // select sim/não
+						$('#'+field).find('option[value= "'+value+'"]').attr('selected',true);
+					default: // text, number input
+						$('#'+field).val(value);
+				}
 			});
 		} else {
-			inject_sel(file, 'unit_type', 'mz012');
-			inject_sel(file, 'unit_authority', 'mz013');
-			inject_sel(file, 'ministries', 'mz014');
-			inject_sel(file, 'unit_state', 'mz015');
-			inject_sel(file, 'unit_service', 'mz023');
+			inject_sel(fileTabsXml, 'unit_type', 'mz012');
+			inject_sel(fileTabsXml, 'unit_authority', 'mz013');
+			inject_sel(fileTabsXml, 'ministries', 'mz014');
+			inject_sel(fileTabsXml, 'unit_state', 'mz015');
+			inject_sel(fileTabsXml, 'unit_service', 'mz023');
 			inject_latlon(latlon_file);
 		}
 
@@ -77,10 +93,7 @@
     	    window.location.href = "../saramoz.html";
         });
 //----------------------------------------------------------------------------------------------------------------------
-
-// aggiungere un parametro che indichi il valore di default !
-
-		function inject_sel(file, tabname, idsel) {
+		function inject_sel(file, tabname, idsel, opt = 1) {
 			var xml_string = app.ReadFile(file);
 			var xml = $.parseXML(xml_string);
 			var tabs = $(xml).children();
@@ -93,7 +106,11 @@
 		            	row.each(function(){
 							var id = $(this).find('id').text();
 							var na = $(this).find('name').text();
-							options += '<option value="' + id + '">' + na + '</option>';
+							if (opt == id) {
+								options += '<option value="' + id + '" selected="selected">' + na + '</option>';
+							} else {
+								options += '<option value="' + id + '">' + na + '</option>';
+							}
 		            	})
 					}
 
@@ -120,9 +137,9 @@
 				$('#mz027').val(lon);
 			}
 		}
+//----------------------------------------------------------------------------------------------------------------------
 
     });
-//----------------------------------------------------------------------------------------------------------------------
 </script>
 <style>
 	body {
@@ -313,7 +330,12 @@
                     <td>Consultas externas apenas (sem internamento)</td>
                 </tr>
                 <tr>
-                    <td colspan="2"><input type="checkbox" id="mz022"></td>
+                    <td colspan="2">
+						<select id="mz022">
+							<option value="0" selected="selected">Não</option>
+							<option value="1">Sim</option>
+						</select>
+					</td>
                 </tr>
                 <tr>
                     <td>MZ023</td>
