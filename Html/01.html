@@ -5,23 +5,28 @@
     <meta name="viewport" content="width=device-width">
 	<meta charset='utf-8'>
     <script src='file:///android_asset/app.js'></script>
-	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&key=AIzaSyCIeZTMfIeXUkueMevGm5dizgIcmCFkKRo"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyCIeZTMfIeXUkueMevGm5dizgIcmCFkKRo"></script>
     <script src="../Misc/jquery-3.1.1.js"></script>
 </head>
 <script>
     $(document).ready(function() {
-
 		var curdir = app.GetAppPath();
 		var form_main_file = curdir + '/Html/form_main.xml';
+		var page00 = curdir + '/saramoz.html';
+		var page05 = curdir + '/Html/05.html';
 		if (app.FileExists(form_main_file)) {
-	        window.location.href = '../Html/05.html';
+	        window.location.href = page05;
 		} else {
-	        init();
+			if ( confirm('Achar as coordenadas ?') ) {
+				init();
+			} else {
+				window.location.href = page05;
+			}
 		}
 //----------------------------------------------------------------------------------------------------------------------
-        $('#voltar').click(function(){ end('../saramoz.html'); });
+        $('#voltar').click(function(){ end(page00); });
 //----------------------------------------------------------------------------------------------------------------------
-        $('#continuar').click(function(){ end('../Html/05.html'); });
+        $('#continuar').click(function(){ end(page05); });
 //----------------------------------------------------------------------------------------------------------------------        
     });
 //----------------------------------------------------------------------------------------------------------------------

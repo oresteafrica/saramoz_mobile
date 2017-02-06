@@ -10,24 +10,27 @@
 <script>
     $(document).ready(function() {
 		var auth = app.LoadNumber( 'auth', 0 );
-		if ( auth == 0 ) {
-			alert('O usuário não é cadastrado');
-		    window.location.href = "../saramoz.html";
-		}
 		var curdir = app.GetAppPath();
 		var server_php = 'http://sis-ma.in/sara/php/';
 		var fileTables = curdir + '/Html/tables.xml';
 		var fileForm1 = curdir + '/Html/form_main.xml';
 		var url1 = server_php + 'sara_tables_to_xml.php';
-		var ajax1 = get_tables(url1, fileTables);
-		var url2 = server_php + 'sara_from_http_to_field1.php';
-		var ajax2 = send_form(url2,fileForm1);
+		if ( auth == 0 ) {
+			$('#msg2').hide();
+			var ajax1 = get_tables(url1, fileTables);
+			$.when(ajax1).done(function() {
+				$('#voltar').prop('disabled',false);
+			});
+		} else {
+			var ajax1 = get_tables(url1, fileTables);
+			var url2 = server_php + 'sara_from_http_to_field1.php';
+			var ajax2 = send_form(url2,fileForm1);
 
-		// https://medium.com/coding-design/writing-better-ajax-8ee4a7fb95f#.qnqc51f9x
-		$.when(ajax1, ajax2).done(function() {
-			$('#voltar').prop('disabled',false);
-		});
-
+			// https://medium.com/coding-design/writing-better-ajax-8ee4a7fb95f#.qnqc51f9x
+			$.when(ajax1, ajax2).done(function() {
+				$('#voltar').prop('disabled',false);
+			});
+		}
 //----------------------------------------------------------------------------------------------------------------------
         $('#voltar').click(function(){
             window.location.href = "../saramoz.html";
@@ -44,7 +47,7 @@
 					$('#msg1').text('Tabelas locais actualizadas').css('color','green');
         		},
 				error: function(a,b,c){ 
-					$('#res').append('Houve problemas de conexão. Aabelas locais não foram actualizadas. Tente mais tarde.');
+					$('#res').append('Houve problemas de conexão. As tabelas locais não foram actualizadas. Tente mais tarde.');
 				},
 				complete: function(a,b){ }
 			});
@@ -66,7 +69,7 @@
 				dataType: 'html',
 				beforeSend: function(a){  },
 				success: function(a){
-					if (a == 'OK') {
+					if (a == '1') {
 						app.DeleteFile(file);
 						$('#msg2').text('Ficha enviada para o servidor').css('color','green');
 					} else {
