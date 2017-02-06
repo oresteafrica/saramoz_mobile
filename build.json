@@ -1,0 +1,11 @@
+{
+	"manifest" : 
+	{ 
+		"minSdkVersion" : 18,
+		"targetSdkVersion" : 21,
+		"debuggable" : false,
+		"removePermissions" : "WRITE_EXTERNAL_STORAGE, ACCESS_WIFI_STATE",
+		"homeScreen":false,
+		"pathPattern":".*\\.jpg,.*\\.txt"
+	}
+}

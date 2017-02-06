@@ -9,25 +9,29 @@
 </head>
 <script>
     $(document).ready(function() {
-        var curfile = window.location.href;
-        var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
+		var curdir = app.GetAppPath();
         var file = curdir + '/Html/tables.xml';
+        var auth = app.LoadNumber( 'auth', 0 );
         $('#content').children('div').click(function(){
             ix = $(this).index();
             switch (ix) { 
 	            case 0:
+            		if ( auth != 1 ) {
+			            alert('O usuário não é cadastrado');
+			            break;
+            		}
             		if ( ! app.FileExists(file) ) {
             			app.ShowPopup('É preciso actualizar');
-            		} else {
-		                window.location.href = "Html/01.html";
+			            break;
             		}
+            		window.location.href = "Html/01.html";
 		            break;
 	            case 1:
             		if ( ! app.FileExists(file) ) {
             			app.ShowPopup('É preciso actualizar');
-            		} else {
-    		            window.location.href = "Html/02.html";
+			            break;
             		}
+            		window.location.href = "Html/02.html";
 		            break;
 	            case 2: 
 		            window.location.href = "Html/03.html";
