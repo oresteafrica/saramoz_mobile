@@ -11,9 +11,11 @@
 <script>
     $(document).ready(function() {
 		var curdir = app.GetAppPath();
+		var latlon_file = curdir + '/Html/latlon.xml';
 		var form_main_file = curdir + '/Html/form_main.xml';
 		var page00 = curdir + '/saramoz.html';
 		var page05 = curdir + '/Html/05.html';
+		app.DeleteFile(latlon_file);
 		if (app.FileExists(form_main_file)) {
 	        window.location.href = page05;
 		} else {
@@ -51,9 +53,8 @@
         $('#met').text(data.provider);
         $('#buttons > button').show();
 
-        var curfile = window.location.href;
-        var curdir = curfile.substring(7, curfile.lastIndexOf('/'));
-		var latlon_file = curdir + '/latlon.xml';
+        var curdir = app.GetAppPath();
+		var latlon_file = curdir + '/Html/latlon.xml';
 		var latlon_xml = '<?xml version="1.0" encoding="UTF-8"?><coord><lat>'+lat+'</lat><lon>'+lon+'</lon></coord>';
 		app.WriteFile(latlon_file,latlon_xml,"utf-8");
 

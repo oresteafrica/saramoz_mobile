@@ -46,7 +46,12 @@
 			inject_sel(fileTabsXml, 'ministries', 'mz014',1);
 			inject_sel(fileTabsXml, 'unit_state', 'mz015',1);
 			inject_sel(fileTabsXml, 'unit_service', 'mz023',1);
-			if (app.FileExists(latlon_file)) { inject_latlon(latlon_file); }
+			if (app.FileExists(latlon_file)) {
+				inject_latlon(latlon_file);
+			} else {
+				$('#mz026').val('');
+				$('#mz027').val('');
+			}
 		}
 
 
