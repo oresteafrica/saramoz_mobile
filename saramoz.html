@@ -5,121 +5,351 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta charset='utf-8'>
     <script src='file:///android_asset/app.js'></script>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyCIeZTMfIeXUkueMevGm5dizgIcmCFkKRo"></script>
     <script src="Misc/jquery-3.1.1.js"></script>
-</head>
-<script>
+    <script src="Misc/saramoz.js"></script>
+    <script>
     $(document).ready(function() {
-		var curdir = app.GetAppPath();
-        var file = curdir + '/Html/tables.xml';
-        var auth = app.LoadNumber( 'auth', 0 );
-        $('#content').children('div').click(function(){
-            ix = $(this).index();
-            switch (ix) { 
-	            case 0:
-            		if ( auth != 1 ) {
-			            alert('O usuário não é cadastrado');
-			            break;
-            		}
-            		if ( ! app.FileExists(file) ) {
-            			app.ShowPopup('É preciso actualizar');
-			            break;
-            		}
-            		window.location.href = "Html/01.html";
-		            break;
-	            case 1:
-            		if ( ! app.FileExists(file) ) {
-            			app.ShowPopup('É preciso actualizar');
-			            break;
-            		}
-            		window.location.href = "Html/02.html";
-		            break;
-	            case 2: 
-		            window.location.href = "Html/03.html";
-		            break;
-	            case 3: 
-		            window.location.href = "Html/04.html";
-		            break;
-            	default:
-		            alert('nenhuma escolha');
-            }
-        });
+
+
     });
-</script>
-<style>
-	body {
-	    background-color: #ffffff;
-	}
-	#page {
-	    width:100%;
-	    float:left;
-	}
-	#logo {
-        height:80px;
-	    background-image:url('Img/Emblem_of_Mozambique.jpg');
-	    background-repeat:no-repeat;
-	    background-position:center;
-	    background-size:contain;
-	}
-	#header {
-	    text-align:center;
-	    margin-bottom:20px;
-	}
-	#head1 {
-	    font-size:x-large;
-	    font-weight:bold;
-	}
-	#head2 {
-	    font-size:x-small;
-	}
-	#content {
-	    margin-bottom:40px;
-	}
-	#content > div {
-	    width:80%;
-	    clear:both;
-	    margin-left: auto;
-	    margin-right: auto;
-	    border: solid 1px black;
-	    border-radius:6px;
-	    background-color:lightgrey;
-	    text-align:center;
-	    padding:8px;
-	    margin-top:10px;
-	}
-	#content > div:hover {
-	    background-color:red;
-	    color:white;
-	    cursor:pointer;
-	}
-	#footer {
-        height:80px;
-	    background-image:url('Img/cdc_jembi_UEM_Moasis.png');
-	    background-repeat:no-repeat;
-	    background-position:center;
-	    background-size:contain;
-	}
-</style>
+    </script>
+    <link rel="stylesheet" type="text/css" href="Misc/saramoz.css" />
+</head>
 <body>
-    <div id="page">
- 
-        <div id="logo">
+
+<!-- ini main page -->
+    <div id="main_page">
+        <div id="main_logo">
         </div>
- 
-        <div id="header">
-            <span id="head1">SARA Moçambique</span><br />
-            <span id="head2">Service Availability and Readiness Assessment</span>
+        <div id="main_header">
+            <span id="main_head1">SARA Moçambique</span><br />
+            <span id="main_head2">Service Availability and Readiness Assessment</span>
         </div>
- 
-        <div id="content">
+        <div id="main_content">
             <div>Entrada dados</div>
             <div>Credencial</div>
             <div>Actualiza servidor</div>
-            <div>Guia do usuário</div>
         </div>
- 
-        <div id="footer">
+        <div id="main_footer">
         </div>
- 
     </div>
+<!-- end main page -->
+
+<!-- ini credential page -->
+    <div id="credential_page">
+        <button class="voltar">Voltar</button>
+        <div class="inform_02" id="form_user_02">
+		    <p>As informações devem ser as mesmas gravadas no servidor para que a credencial possa ser aceite</p>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Nome completo</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" id="user_01_02"></td>
+                    </tr>
+                    <tr>
+                        <td>Endereço email</td>
+                    </tr>
+                    <tr>
+                        <td><input type="email" id="user_02_02"></td>
+                    </tr>
+                    <tr>
+                        <td>Número do celular</td>
+                    </tr>
+                    <tr>
+                        <td><input type="number" id="user_03_02"></td>
+                    </tr>
+                    <tr>
+                        <td>Senha</td>
+                    </tr>
+                    <tr>
+                        <td><input type="password" id="user_04_02"></td>
+                    </tr>
+                    <tr>
+                        <td>Endereço MAC</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" id="mac_02" readonly="readonly"></td>
+                    </tr>
+                    <tr>
+                        <td>Id do aparelho</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" id="model_02" readonly="readonly"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="bu_cre_02" id="credenciar_02">Credenciar</button>
+        </div>
+        <div class="inform_02" id="form_curr_user_02">
+		    <p>Usuário corrente:</p>
+		    <p class="curr_user_02"></p>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Senha</td>
+                    </tr>
+                    <tr>
+                        <td><input type="password" id="user_senha_02"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="bu_cre_02" id="login_02">Login</button>
+            <button class="bu_cre_02" id="outro_02">Outro usuário</button>
+        </div>
+        <div class="inform_02" id="info_curr_user_02">
+		    <p>Usuário corrente:</p>
+		    <p class="curr_user_02"></p>
+            </table>
+            <button class="bu_cre_02" id="outro_02">Apagar usuário corrente</button>
+        </div>
+    </div>
+<!-- end credential page -->
+
+<!-- ini update page -->
+    <div id="update_page">
+        <div>
+            <button class="voltar" disabled="disabled">Voltar</button>
+		    <h3 class="update_page_msg" id="update_page_msg1">Aguardo a recepção de tabelas do servidor</h3>
+		    <h3 class="update_page_msg" id="update_page_msg2">Aguardo o envio da ficha ao servidor</h3>
+        </div>
+        <div id="update_page_res">
+        </div>
+    </div>
+<!-- end update page -->
+
+<!-- ini coord page -->
+    <div id="coord_page">
+        <div class="page01" id="buttons_01">
+            <button id="voltar_01">Voltar</button>
+            <button id="continuar_01">Continuar</button>
+        </div>
+        <div class="page01" id="main_01">
+            <div class="page01" id="coord_01">
+                <table>
+                    <thead>
+                    </thead>
+                    <tbody>
+                        <tr><td>Latitude</td><td id="lat_01"></td></tr>
+                        <tr><td>Longitude</td><td id="lon_01"></td></tr>
+                        <tr><td>Precisão</td><td id="pre_01"></td></tr>
+                        <tr><td>Método</td><td id="met_01"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="page01" id="map_01"><img alt="aguarde" src="Img/small_rect__blue_load.gif" /></div>
+        </div>
+    </div>
+<!-- end coord page -->
+
+<!-- ini form page -->
+    <div id="form_page">
+    <div>
+        <button class="voltar_05">Voltar sem gravar</button>
+    </div>
+    <div class="inform_05" id="form_elements_05">
+        <table>
+            <tbody>
+                <tr>
+                    <td>MZ001</td>
+                    <td>Código da unidade</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="text" id="mz001" maxlength="16" size="16" pattern=".{3,16}"></td>
+                </tr>
+                <tr>
+                    <td>MZ003</td>
+                    <td>Nome da unidade</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="text" id="mz003" maxlength="255"></td>
+                </tr>
+                <tr>
+                    <td>MZ004</td>
+                    <td>Nome curto da unidade</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="text" id="mz004" maxlength="10" size="10" pattern=".{3,10}"></td>
+                </tr>
+                <tr>
+                    <td>MZ005</td>
+                    <td>Localização da unidade</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="text" id="mz005" maxlength="255"></td>
+                </tr>
+                <tr>
+                    <td>MZ006</td>
+                    <td>Província</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+						<select id="mz006">
+							<option value="2">Niassa</option>
+							<option value="3">Cabo Delgado</option>
+							<option value="4">Nampula</option>
+							<option value="5">Tete</option>
+							<option value="6">Zambezia</option>
+							<option value="7">Manica</option>
+							<option value="8">Sofala</option>
+							<option value="9">Gaza</option>
+							<option value="10">Inhambane</option>
+							<option value="11">Maputo cidade</option>
+							<option value="12">Maputo</option>
+						</select>
+					</td>
+                </tr>
+                <tr>
+                    <td>MZ007</td>
+                    <td>Distrito</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="text" id="mz007" maxlength="50" pattern=".{3,50}"></td>
+                </tr>
+                <tr>
+                    <td>MZ008</td>
+                    <td>Posto Administrativo</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="text" id="mz008" maxlength="255"></td>
+                </tr>
+                <tr>
+                    <td>MZ009</td>
+                    <td>Localidade</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="text" id="mz009" maxlength="255"></td>
+                </tr>
+                <tr>
+                    <td>MZ010</td>
+                    <td>Endereço físico</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="text" id="mz010" maxlength="255"></td>
+                </tr>
+                <tr>
+                    <td>MZ011</td>
+                    <td>Informação de contacto</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="text" id="mz011" maxlength="255"></td>
+                </tr>
+                <tr>
+                    <td>MZ012</td>
+                    <td>Tipo de unidades</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><select id="mz012"></select></td>
+                </tr>
+                <tr>
+                    <td>MZ013</td>
+                    <td>Autoridade gestora</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><select id="mz013"></select></td>
+                </tr>
+                <tr>
+                    <td>MZ014</td>
+                    <td>Ministério de Tutela</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><select id="mz014"></select></td>
+                </tr>
+                <tr>
+                    <td>MZ015</td>
+                    <td>Estado operacional</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><select id="mz015"></select></td>
+                </tr>
+                <tr>
+                    <td>MZ016</td>
+                    <td>Data de construção</td></tr>
+                <tr>
+                    <td colspan="2"><input type="date" id="mz016"></td>
+                </tr>
+                <tr>
+                    <td>MZ017</td>
+                    <td>Data de início de funcionamento</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="date" id="mz017"></td>
+                </tr>
+                <tr>
+                    <td>MZ018</td>
+                    <td>Data da última requalificação</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="date" id="mz018"></td>
+                </tr>
+                <tr>
+                    <td>MZ019</td>
+                    <td>Data do último estado operacional</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="date" id="mz019"></td>
+                </tr>
+                <tr>
+                    <td>MZ020</td>
+                    <td>Data de alteração de dados da Unidade de Saúde</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="date" id="mz020"></td>
+                </tr>
+                <tr>
+                    <td>MZ022</td>
+                    <td>Consultas externas apenas (sem internamento)</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+						<select id="mz022">
+							<option value="0" selected="selected">Não</option>
+							<option value="1">Sim</option>
+						</select>
+					</td>
+                </tr>
+                <tr>
+                    <td>MZ023</td>
+                    <td>Tipos de serviços prestados</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><select id="mz023"></select></td>
+                </tr>
+
+                <tr>
+                    <td>MZ025</td>
+                    <td>Altitude (metros)</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="number" step="1" min="0" id="mz025"></td>
+                </tr>
+                <tr>
+                    <td>MZ026</td>
+                    <td>Latitude (sistema WGS84)</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="number" step="0.000001" min="-28" max="-9" id="mz026"></td>
+                </tr>
+                <tr>
+                    <td>MZ027</td>
+                    <td>Longitude (sistema WGS84)</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="number" step="0.000001" min="28" max="53" id="mz027"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button id="gravar_05">Gravar os dados</button>
+        <button class="voltar_05">Voltar sem gravar</button>
+    </div>
+    </div>
+<!-- end form page -->
+
+
+<div id="debug" style="width:100%;margin-top:20px;float:left"></div>
+
+
 </body>
 </html>
