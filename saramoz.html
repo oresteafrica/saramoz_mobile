@@ -8,12 +8,6 @@
 	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyCIeZTMfIeXUkueMevGm5dizgIcmCFkKRo"></script>
     <script src="Misc/jquery-3.1.1.js"></script>
     <script src="Misc/saramoz.js"></script>
-    <script>
-    $(document).ready(function() {
-
-
-    });
-    </script>
     <link rel="stylesheet" type="text/css" href="Misc/saramoz.css" />
 </head>
 <body>
@@ -38,7 +32,7 @@
 
 <!-- ini credential page -->
     <div id="credential_page">
-        <button class="voltar">Voltar</button>
+        <button class="voltar_credential">Voltar</button>
         <div class="inform_02" id="form_user_02">
 		    <p>As informações devem ser as mesmas gravadas no servidor para que a credencial possa ser aceite</p>
             <table>
@@ -111,7 +105,7 @@
 <!-- ini update page -->
     <div id="update_page">
         <div>
-            <button class="voltar" disabled="disabled">Voltar</button>
+            <button id="voltar_from_update">Voltar</button>
 		    <h3 class="update_page_msg" id="update_page_msg1">Aguardo a recepção de tabelas do servidor</h3>
 		    <h3 class="update_page_msg" id="update_page_msg2">Aguardo o envio da ficha ao servidor</h3>
         </div>
@@ -238,7 +232,7 @@
                 </tr>
                 <tr>
                     <td>MZ012</td>
-                    <td>Tipo de unidades</td>
+                    <td>Tipo de unidade</td>
                 </tr>
                 <tr>
                     <td colspan="2"><select id="mz012"></select></td>
@@ -323,7 +317,7 @@
                     <td>Altitude (metros)</td>
                 </tr>
                 <tr>
-                    <td colspan="2"><input type="number" step="1" min="0" id="mz025"></td>
+                    <td colspan="2"><input type="number" step="1" min="0" id="mz025" value="0"></td>
                 </tr>
                 <tr>
                     <td>MZ026</td>

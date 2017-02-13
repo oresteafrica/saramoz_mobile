@@ -2,45 +2,45 @@ $(document).ready(function() {
 
 	// ini vars area ---------------------------------------------------------------------------------------------------
 	var curdir = app.GetAppPath();
-	var page00 = curdir + '/saramoz.html';
-	var page01 = curdir + '/Html/01.html';
-	var page03 = curdir + '/Html/03.html';
-	var page05 = curdir + '/Html/05.html';
-	var form_main_file = curdir + '/form_main.xml';
-	var f_tables = curdir + '/tables.xml';
-	var fileUser = curdir + '/user.xml';
 	var small_wait_gif = curdir + '/Img/small_rect__blue_load.gif';
+    var ag = '<img alt="aguarde" src="'+small_wait_gif+'" />';
+
+	var workdir = '/sdcard/saramoz/xml';
+	app.MakeFolder( workdir );
+
+	var form_main_file = workdir + '/form_main.xml';
+	var f_tables = workdir + '/tables.xml';
+	var fileUser = workdir + '/user.xml';
+
 	var server_php = 'http://sis-ma.in/sara/php/';
 	var url_tables = server_php + 'sara_tables_to_xml.php';
 	var url_form_field = server_php + 'sara_from_http_to_field1.php';
 	var mac = app.GetMacAddress();
 	var model = app.GetModel();
-	var is_f_tables = app.FileExists(f_tables);
-	var is_fileUser = app.FileExists(fileUser);
-	var is_today_ok = compare_today_with_stored_date();
 	var user_form = 0; // variable to choose user form: 0 = no user, 1 = user expired, 2 = user active
     var loc = app.CreateLocator( "GPS,Network" );
 	// end vars area ---------------------------------------------------------------------------------------------------
 
+
+	// ini debug -------------------------------------------------------------------------------------------------------
+	//$('#debug').append('<p>small_wait_gif = '+small_wait_gif+'</p>');
+	//$('#debug').append('<p>'+ag+'</p>');
+	// ini debug -------------------------------------------------------------------------------------------------------
+
 	// ini init --------------------------------------------------------------------------------------------------------
 	$('#main_page').show();
-	if ( is_fileUser && is_today_ok ) { user_form = 2; }
-	if ( is_fileUser && ( ! is_today_ok ) ) { user_form = 1; }
-	if ( ! is_fileUser ) { user_form = 0; }
-	app.SaveNumber( 'user_form', user_form );
-	
 	// end init --------------------------------------------------------------------------------------------------------
 
 	// ini main menu ---------------------------------------------------------------------------------------------------
     $('#main_content').children('div').click(function(){
         ix = $(this).index();
         switch (ix) { 
-	        case 0: // Entrada dados
-            	if ( user_form != 2 ) {
+	        case 0: // Entrada dados	<-------------------------------------------------------------------------------
+            	if ( check_user_form(workdir) != 2 ) {
 			        alert('O usuário não é cadastrado');
 			        break;
             	}
-            	if ( ! is_f_tables ) {
+            	if ( ! app.FileExists(f_tables) ) {
             		app.ShowPopup('É preciso actualizar');
 			        break;
             	}
@@ -53,46 +53,43 @@ $(document).ready(function() {
 				if ( confirm('Achar as coordenadas ?') ) {
 					$('#main_page').hide();
 					$('#coord_page').show();
+        			$('#lat_01').html(ag);
+        			$('#lon_01').html(ag);
+        			$('#pre_01').html(ag);
+        			$('#met_01').html(ag);
+					loc.SetOnChange(function(data) {
+	        			lat = data.latitude;
+    	    			lon = data.longitude;
+	        			$('#lat_01').text(lat);
+    	    			$('#lon_01').text(lon);
+ 	       				$('#pre_01').text(data.accuracy+' m.');
+    	    			$('#met_01').text(data.provider);
+    	    			$('#buttons_01 > button').show();
+	        			$.ajax({
+    	        			url: 'http://sis-ma.in/sara/php/ping.php',
+        	    			success: function(result){
+            					var myLatLng = {lat: lat, lng: lon};
+                				var map = new google.maps.Map($('#map_01')[0], {
+              	  					zoom: 8,
+              	      				center: myLatLng,
+              	    			  	mapTypeId: google.maps.MapTypeId.ROADMAP,
+              	      				disableDefaultUI: true
+              	  				});
+              	  				var marker = new google.maps.Marker({
+              	  					position: myLatLng,
+              		  				map: map,
+               	     				title: 'Estou aqui'
+               	 				});
+            				},
+            				error: function(result){
+								var map_error = '<p>Não se pode visualizar o mapa porque não há conexão Internet</p>';
+                				$('#map_01').html(map_error);
+            				}
+        				});
 
-//---------------------------------------------------------------------------------------------------------------------
-    	var ag = '<img alt="aguarde" src="'+curdir+'/Img/small_rect__blue_load.gif" />';
-        $('#lat_01').html(ag);
-        $('#lon_01').html(ag);
-        $('#pre_01').html(ag);
-        $('#met_01').html(ag);
-		loc.SetOnChange(function(data) {
-	        lat = data.latitude;
-    	    lon = data.longitude;
-	        $('#lat_01').text(lat);
-    	    $('#lon_01').text(lon);
- 	       $('#pre_01').text(data.accuracy+' m.');
-    	    $('#met_01').text(data.provider);
-    	    $('#buttons_01 > button').show();
-	        $.ajax({
-    	        url: 'http://sis-ma.in/sara/php/ping.php',
-        	    success: function(result){
-            		var myLatLng = {lat: lat, lng: lon};
-                	var map = new google.maps.Map($('#map_01')[0], {
-              	  		zoom: 4,
-              	      	center: myLatLng,
-              	      	mapTypeId: google.maps.MapTypeId.ROADMAP,
-              	      	disableDefaultUI: true
-              	  	});
-              	  	var marker = new google.maps.Marker({
-              	  		position: myLatLng,
-              		  	map: map,
-               	     	title: 'Estou aqui'
-               	 	});
-            	},
-            	error: function(result){
-                	$('#map_01').html('<p>Não se pode visualizar o mapa porque não há conexão Internet</p>');
-            	}
-        	});
-
-    	});
-        loc.SetRate( 10 ); // seconds
-        loc.Start();
-//---------------------------------------------------------------------------------------------------------------------
+    				});
+			        loc.SetRate( 10 ); // seconds
+        			loc.Start();
 			        break;
 				} else {
 					$('#main_page').hide();
@@ -103,7 +100,8 @@ $(document).ready(function() {
 			        break;
 				}
 		        break;
-	        case 1: // Credencial
+	        case 1: // Credencial	<-----------------------------------------------------------------------------------
+				user_form = check_user_form(workdir);
 				$('#main_page').hide();
 				$('#credential_page').show();
 				if (user_form == 0) { // user not registered
@@ -124,24 +122,18 @@ $(document).ready(function() {
 					$('#info_curr_user_02').show();
 				}
 		        break;
-	        case 2: // Actualiza servidor
-            	if ( user_form != 2 ) {
+	        case 2: // Actualiza servidor	<---------------------------------------------------------------------------
+            	if ( check_user_form(workdir) != 2 ) {
 			        alert('O usuário não é cadastrado');
 			        break;
             	} else {
 					$('#main_page').hide();
 					$('#update_page').show();
-					var ajax1 = get_tables(url_tables, f_tables);
+					get_tables(url_tables, f_tables);
 					if ( app.FileExists(form_main_file) ) {
-						var ajax2 = send_form(url_form_field,form_main_file);
-						$.when(ajax1, ajax2).done(function() {
-							$('.voltar').prop('disabled',false);
-						});
+						send_form(url_form_field,form_main_file);
 					} else {
 						$('#update_page_msg2').hide();
-						$.when(ajax1).done(function() {
-							$('.voltar').prop('disabled',false);
-						});
 					}
 				}
 
@@ -153,8 +145,25 @@ $(document).ready(function() {
 
 	// ini clicks ------------------------------------------------------------------------------------------------------
 		//------------------------------------------------
-        $('.voltar').click(function(){
-            window.location.href = page00;
+        $('#voltar_from_update').click(function(){
+			$('#update_page').hide();
+			$('#main_page').show();
+        });
+		//------------------------------------------------
+        $('.voltar_credential').click(function(){
+			$('#credential_page').hide();
+			$('#main_page').show();
+        });
+		//------------------------------------------------
+        $('.voltar_05').click(function(){
+			$('#form_page').hide();
+			$('#main_page').show();
+        });
+		//------------------------------------------------
+    	$('#voltar_01').click(function(){
+			loc.Stop();
+			$('#coord_page').hide();
+			$('#main_page').show();
         });
 		//------------------------------------------------
         $('#credenciar_02').click(function(){ 
@@ -192,10 +201,12 @@ $(document).ready(function() {
 						app.WriteFile(fileUser,xmlUser,"UTF-8");
 						app.SaveNumber( 'auth', 1 );
 						alert('Cadastramento efectuado com sucesso');
-			            window.location.href = page00;
+						$('#credential_page').hide();
+						$('#main_page').show();
 					} else {
 						alert('O usuário não é cadastrado. Contacte o administrador de rede.');
-			            window.location.href = page00;
+						$('#credential_page').hide();
+						$('#main_page').show();
 					}
         		},
 				error: function(a,b,c){ alert('Problemas com a conexão Internet, tente mais tarde.'); return; },
@@ -212,36 +223,34 @@ $(document).ready(function() {
 				local_se = $(user).children().find('pass').text();
 			} else {
 				alert('Login impossível. Tente cadastrar novamente.');
-			    window.location.href = page00;
+				$('#credential_page').hide();
+				$('#main_page').show();
 				return;
 			}
 			if ( $('#user_senha_02').val() == local_se ) {
 				app.SaveNumber( 'auth', 1 );
 				if ( attrib_today_date_to_user_file() != 1) {
 					alert('Login impossível. Tente cadastrar novamente.');
-				    window.location.href = page00;
+					$('#credential_page').hide();
+					$('#main_page').show();
 					return;
 				}
 				alert('O usuário é cadastrado. Pode continuar o seu trabalho.');
-			    window.location.href = page00;
+				$('#credential_page').hide();
+				$('#main_page').show();
 			} else {
 				alert('Login não correto');
-			    window.location.href = page00;
+				$('#credential_page').hide();
+				$('#main_page').show();
 			}
         });
 		//------------------------------------------------
         $('#outro_02').click(function(){
 			app.DeleteFile( fileUser );
-			app.SaveNumber( 'user_form', 0 );
 			alert('O usuário corrente foi apagado, pode cadastrar outro usuário.');
-			window.location.href = page00;
-
+			$('#credential_page').hide();
+			$('#main_page').show();
         });
-		//------------------------------------------------
-    	$('#voltar_01').click(function(){
-			loc.Stop();
-			window.location.href = page00;
-		});
 		//------------------------------------------------
 		$('#continuar_01').click(function(){
 			loc.Stop();
@@ -253,8 +262,6 @@ $(document).ready(function() {
 			$('#mz027').val(inlon);
 			activate_5(form_main_file, f_tables);
 		});
-		//------------------------------------------------
-        $('.voltar_05').click(function(){window.location.href = page00;});
 		//------------------------------------------------
         $('#gravar_05').click(function(){
 			var today = new Date();
@@ -281,7 +288,8 @@ $(document).ready(function() {
 			res += '</form_main>';
 			app.WriteFile(form_main_file,res,"utf-8");
 			alert('O formulário foi gravado na base de dados local. Agora pode actualizar o servidor.');
-    	    window.location.href = page00;
+			$('#form_page').hide();
+			$('#main_page').show();
         });
 		//------------------------------------------------
 	// end clicks ------------------------------------------------------------------------------------------------------
@@ -368,13 +376,132 @@ $(document).ready(function() {
 		function send_form(url,file) {
 			var error_msg = 'Houve problemas de conexão. A ficha não foi enviada para o servidor. Tente mais tarde.';
 			if (! app.FileExists(file)) { return false; }
+			$('#update_page_msg2').text('Aguarde o envio da ficha para o servidor').css('color','red');
 			var xmlForm1 = app.ReadFile(file,"UTF-8");
 			var xml = $.parseXML(xmlForm1);
 			var	rows = $(xml).children().find('row');
 			var data = [];
+			var form_check = 1;
+			var send_err_msg_a = [];
 			rows.each(function(ind,ele){
-				data.push($(ele).find('id').text()+'='+$(ele).find('value').text());
+				var key = $(ele).find('id').text();
+				var val = $(ele).find('value').text();
+				var skey = '';
+		        switch (key) { 
+	    		    case 'mz001':
+						skey = 'Código da unidade';
+						if(val.length > 16) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
+						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz003':
+						skey = 'Nome da unidade';
+						if(val.length > 255) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
+						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz004':
+						skey = 'Nome curto da unidade';
+						if(val.length > 10) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
+						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz005':
+						skey = 'Localização da unidade';
+						if(val.length > 255) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
+						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz007':
+						skey = 'Distrito';
+						if(val.length > 50) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
+						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz008':
+						skey = 'Posto Administrativo';
+						if(val.length > 255) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
+						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz009':
+						skey = 'Localidade';
+						if(val.length > 255) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
+						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz010':
+						skey = 'Endereço fisico';
+						if(val.length > 255) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
+						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz011':
+						skey = 'Informação de contacto';
+						if(val.length > 255) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
+						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz006':
+						skey = 'Província';
+						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz012':
+						skey = 'Tipo de unidade';
+						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz013':
+						skey = 'Autoridade gestora';
+						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz014':
+						skey = 'Ministério de tutela';
+						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz015':
+						skey = 'Estado operacional';
+						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz023': 
+						skey = 'Tipos de serviços prestados';
+						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz022':
+						skey = 'Consultas externas apenas';
+						if(val > 1 || val < 0) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz016':
+						skey = 'Data de construção';
+						if(! valid(val)) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz017':
+						skey = 'Data de ínicio';
+						if(! valid(val)) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz018':
+						skey = 'Data última requalificação';
+						if(! valid(val)) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz019':
+						skey = 'Data do último estado operacional';
+						if(! valid(val)) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz020':
+						skey = 'Data alteração de dados da Unidade de Saúde';
+						if(! valid(val)) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz025':
+						skey = 'Altitude';
+						if( isNaN(val) ) { send_err_msg_a.push('Falta '+skey+' (pode ser 0)'); form_check =0; }
+						break;
+	    		    case 'mz026':
+						skey = 'Latitude';
+						if( isNaN(val) ) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz027':
+						skey = 'Longitude';
+						if( isNaN(val) ) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+				}
+				data.push(key+'='+val);
 			});
+			if (form_check == 0) {
+				alert(send_err_msg_a.join('\n')+'\n\nCorrigir os erros acima.');
+				$('#update_page').hide();
+				$('#main_page').show();				
+				return false;
+			}
 			var datastring = '?' + data.join('&');
     		$.ajax({
 				url: url + datastring,
@@ -483,7 +610,25 @@ $(document).ready(function() {
 			}
 		}
 		//------------------------------------------------
+		function valid(mysql_date) {
+			var date_splitted = mysql_date.split('-');
+			ret = Date.parse(date_splitted[0],date_splitted[1],date_splitted[2]);
+			if (isNaN(ret)) { return false; } else { return true; }
+		}
 		//------------------------------------------------
+		function check_user_form(workdir) {
+			var form_main_file = workdir + '/form_main.xml';
+			var f_tables = workdir + '/tables.xml';
+			var fileUser = workdir + '/user.xml';
+			var is_f_tables = app.FileExists(f_tables);
+			var is_fileUser = app.FileExists(fileUser);
+			var user_form;
+			var is_today_ok = compare_today_with_stored_date();
+			if ( is_fileUser && is_today_ok ) { user_form = 2; }
+			if ( is_fileUser && ( ! is_today_ok ) ) { user_form = 1; }
+			if ( ! is_fileUser ) { user_form = 0; }
+			return user_form;
+		}
 		//------------------------------------------------
 		//------------------------------------------------
 		//------------------------------------------------
