@@ -110,6 +110,11 @@ $(document).ready(function() {
 					$('#form_user_02').show();
 					$('#form_curr_user_02').hide();
 					$('#info_curr_user_02').hide();
+				} else {
+					var xmlUser = app.ReadFile(fileUser,"UTF-8");
+					var user = $.parseXML(xmlUser);
+					var username = $(user).children().find('name').text();
+					$('.curr_user_02').text(username);
 				}
 				if (user_form == 1) {// user expired
 					$('#form_user_02').hide();
@@ -277,14 +282,30 @@ $(document).ready(function() {
 				alert('O usuário não é cadastrado. Deve efectuar login.');
 				return;
 			}
-			var res = '<?xml version="1.0" encoding="UTF-8"?><form_main>';
+			var res = '<?xml version="1.0" encoding="UTF-8"?>' + "\n";
+			res += '<form_main>' + "\n";
 			res += '<row><id>op_id</id><value>' + local_id + '</value></row>' + "\n";
-			res += '<row><id>in_date</id><value>' + mysql_today + '</value></row> + "\n"';
+			res += '<row><id>in_date</id><value>' + mysql_today + '</value></row>' + "\n";
 			var second_trs = $('#form_elements_05 > table > tbody > tr:odd');
 			second_trs.each(function(){
 				var ele = $(this).children().eq(0).children().eq(0);
-				res += '<row><id>' + $(ele).prop('id') + '</id><value>' + $(ele).val() + '</value></row>' + "\n";
+				var eleid = $(ele).prop('id');
+				if (eleid == 'mz023_c') { return true; }  // managed separately
+				res += '<row><id>' + eleid + '</id><value>' + $(ele).val() + '</value></row>' + "\n";
 		    });
+
+			// ini section mz023_c
+			var checked_ids_array = [];
+			$('#mz023_c > input:checked').each(function(){
+				var checked_id = this.id;
+				var checked_id_splitted = checked_id.split('_');
+				var service_id = checked_id_splitted[2];
+				checked_ids_array.push(service_id);
+		    });
+			var checked_ids_string = checked_ids_array.join(',');
+			res += '<row><id>mz023_c</id><value>' + checked_ids_string + '</value></row>' + "\n";
+			// end section mz023_c
+
 			res += '</form_main>';
 			app.WriteFile(form_main_file,res,"utf-8");
 			alert('O formulário foi gravado na base de dados local. Agora pode actualizar o servidor.');
@@ -481,6 +502,10 @@ $(document).ready(function() {
 						skey = 'Data alteração de dados da Unidade de Saúde';
 						if(! valid(val)) { send_err_msg_a.push('Falta '+skey); form_check =0; }
 						break;
+	    		    case 'mz023_c':
+						skey = 'Tipos de serviços prestados';
+						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
 	    		    case 'mz025':
 						skey = 'Altitude';
 						if( isNaN(val) ) { send_err_msg_a.push('Falta '+skey+' (pode ser 0)'); form_check =0; }
@@ -542,6 +567,41 @@ $(document).ready(function() {
 			}
 		}
 		//------------------------------------------------
+		function inject_checkboxdiv(file, tabname, divid, value) {
+			if (typeof(value)==='undefined') value = '';
+			var xml_string = app.ReadFile(file); // where tables are stored
+			var xml = $.parseXML(xml_string);
+			var tabs = $(xml).children();
+			var result = '';
+			var chk1 = '<input type="checkbox" id="';
+			var chk2 = '" />  ----- ';
+			var chk3 = '<br /><hr />\n';
+			var chk4 = '<input type="checkbox" checked="checked" id="';
+			var array_values = (value.length > 1)?value.split(','):[];
+            tabs.each(function(){
+				var rows = $(this).children();
+	            rows.each(function(){
+					if ( this.tagName == tabname ) {
+						var row = $(this).children();
+		            	row.each(function(){
+							var id = $(this).find('id').text();
+							var na = $(this).find('name').text();
+							if (value == '') {
+								result += chk1 + divid + '_' + id + chk2 + na + chk3; // unchecked
+							} else {
+								if (array_values.indexOf(id) != -1) {
+									result += chk4 + divid + '_' + id + chk2 + na + chk3; // checked
+								} else {
+									result += chk1 + divid + '_' + id + chk2 + na + chk3; // unchecked
+								}
+							}
+				     	}); // row.each
+					} // if ( this.tagName == tabname )
+		     	}); // rows.each
+	        }); // tabs.each
+ 			$('#'+divid).html(result);
+		}
+		//------------------------------------------------
 		function inject_sel(file, tabname, idsel, opt) {
 			var xml_string = app.ReadFile(file);
 			var xml = $.parseXML(xml_string);
@@ -580,19 +640,19 @@ $(document).ready(function() {
 							$('#'+field).find('option[value= "'+value+'"]').attr('selected',true);
 							break;
 						case 'mz012': // select
-							inject_sel(fileTabsXml, 'unit_type', 'mz012', value);
+							inject_sel(fileTabsXml, 'unit_type', field, value);
 							break;
 						case 'mz013': // select
-							inject_sel(fileTabsXml, 'unit_authority', 'mz013', value);
+							inject_sel(fileTabsXml, 'unit_authority', field, value);
 							break;
 						case 'mz014': // select
-							inject_sel(fileTabsXml, 'ministries', 'mz014', value);
+							inject_sel(fileTabsXml, 'ministries', field, value);
 							break;
 						case 'mz015': // select
-							inject_sel(fileTabsXml, 'unit_state', 'mz015', value);
+							inject_sel(fileTabsXml, 'unit_state', field, value);
 							break;
-						case 'mz023': // select
-							inject_sel(fileTabsXml, 'unit_service', 'mz023', value);
+						case 'mz023_c': // select
+							inject_checkboxdiv(fileTabsXml, 'unit_service', field, value)
 							break;
 						case 'mz022': // select sim/não
 							$('#'+field).find('option[value= "'+value+'"]').attr('selected',true);
@@ -606,7 +666,7 @@ $(document).ready(function() {
 				inject_sel(fileTabsXml, 'unit_authority', 'mz013',1);
 				inject_sel(fileTabsXml, 'ministries', 'mz014',1);
 				inject_sel(fileTabsXml, 'unit_state', 'mz015',1);
-				inject_sel(fileTabsXml, 'unit_service', 'mz023',1);
+				inject_checkboxdiv(fileTabsXml, 'unit_service', 'mz023_c')
 			}
 		}
 		//------------------------------------------------
