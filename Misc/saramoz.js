@@ -269,6 +269,9 @@ $(document).ready(function() {
 		});
 		//------------------------------------------------
         $('#gravar_05').click(function(){
+		//------------------------------------------------
+		// save current input form to xlm file for later transmission to server
+		//------------------------------------------------
 			var today = new Date();
 			var dd = today.getDate();
 			var mm = today.getMonth()+1; //January is 0!
@@ -286,7 +289,7 @@ $(document).ready(function() {
 			res += '<form_main>' + "\n";
 			res += '<row><id>op_id</id><value>' + local_id + '</value></row>' + "\n";
 			res += '<row><id>in_date</id><value>' + mysql_today + '</value></row>' + "\n";
-			var second_trs = $('#form_elements_05 > table > tbody > tr:odd');
+			var second_trs = $('#form_elements_05 > table:nth-of-type(1) > tbody > tr:odd');
 			second_trs.each(function(){
 				var ele = $(this).children().eq(0).children().eq(0);
 				var eleid = $(ele).prop('id');
@@ -305,6 +308,17 @@ $(document).ready(function() {
 			var checked_ids_string = checked_ids_array.join(',');
 			res += '<row><id>mz023_c</id><value>' + checked_ids_string + '</value></row>' + "\n";
 			// end section mz023_c
+
+			// ini section mz200
+			var inputs_from_table_mz200 = $('#form_page table:nth-of-type(2) > tbody > tr > td > input');
+			inputs_from_table_mz200.each(function(){
+				var mz200_val = parseInt($(this).val());
+				var mz200_id = this.id;
+				if ( !isNaN(mz200_val)  && mz200_val > 0) {
+					res += '<row><id>' + mz200_id + '</id><value>' + mz200_val + '</value></row>' + "\n";
+				}
+		    });
+			// end section mz200
 
 			res += '</form_main>';
 			app.WriteFile(form_main_file,res,"utf-8");

@@ -105,6 +105,11 @@ input[type=checkbox] {
     float:left;
 	display:none;
 }
+#form_page caption {
+    text-align:left;
+    font-weight:bold;
+	font-size:large;
+}
 #form_elements_05 {
 	margin-bottom:500px;
 }
@@ -122,8 +127,14 @@ input[type=checkbox] {
 #form_elements_05 > table > tbody > tr > td > select {
     font-size:x-small;
 }
-form_page > div > button {
-	margin-right:8px;
+#form_page table:nth-of-type(2) > tbody > tr > td > input {
+    width:40px;
+}
+#form_page > div > button {
+	margin-right:40px;
+	margin-bottom:20px;
+	width:30%;
+	height:100px;
 }
 
 
