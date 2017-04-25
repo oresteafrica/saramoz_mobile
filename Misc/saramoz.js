@@ -4,14 +4,13 @@ $(document).ready(function() {
 	var curdir = app.GetAppPath();
 	var small_wait_gif = curdir + '/Img/small_rect__blue_load.gif';
     var ag = '<img alt="aguarde" src="'+small_wait_gif+'" />';
-
 	var workdir = '/sdcard/saramoz/xml';
 	app.MakeFolder( workdir );
 
 	var form_main_file = workdir + '/form_main.xml';
 	var f_tables = workdir + '/tables.xml';
 	var fileUser = workdir + '/user.xml';
-
+	var f_debug = workdir + '/debug.txt';
 	var server_php = 'http://sis-ma.in/sara/php/';
 	var url_tables = server_php + 'sara_tables_to_xml.php';
 	var url_form_field = server_php + 'sara_from_http_to_field1.php';
@@ -327,8 +326,37 @@ $(document).ready(function() {
 			$('#main_page').show();
         });
 		//------------------------------------------------
+		$('#bu_mz003_3').click(function(){
+			$('.mz003_row_select').show();
+			$('.mz003_row_input').hide();
+        });
+		//------------------------------------------------
 	// end clicks ------------------------------------------------------------------------------------------------------
 
+
+	// ini changes -----------------------------------------------------------------------------------------------------
+		//------------------------------------------------
+			$('#mz006').change(function(){
+				$('#mz007_n').html('<option value="0" select="selected">Escolhe o distrito</option>');
+				dist2select(f_tables, this.value, '#mz007_n', 0);
+				$('#mz007_n').show();
+				$('#mz003_n').hide();
+			});
+		//------------------------------------------------
+			$('#mz007_n').change(function(){
+				$('#mz003_n').html('<option value="0" select="selected">Escolhe a unidade</option>');
+				us2select(f_tables, $('#mz006').val(), this.value, '#mz003_n', 0);
+				$('#mz003_n').show();
+			});
+		//------------------------------------------------
+			$('#mz003_n').change(function(){
+				if ( this.value==0 ) {
+					$('.mz003_row_select').hide();
+					$('.mz003_row_input').show();
+				}
+			});
+		//------------------------------------------------
+	// end changes -----------------------------------------------------------------------------------------------------
 
 
 	// ini funcs -------------------------------------------------------------------------------------------------------
@@ -418,6 +446,7 @@ $(document).ready(function() {
 			var data = [];
 			var form_check = 1;
 			var send_err_msg_a = [];
+			var mz003; var mz003_n;
 			rows.each(function(ind,ele){
 				var key = $(ele).find('id').text();
 				var val = $(ele).find('value').text();
@@ -426,11 +455,6 @@ $(document).ready(function() {
 	    		    case 'mz001':
 						skey = 'Código da unidade';
 						if(val.length > 16) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
-						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
-						break;
-	    		    case 'mz003':
-						skey = 'Nome da unidade';
-						if(val.length > 255) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
 						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
 						break;
 	    		    case 'mz004':
@@ -443,10 +467,13 @@ $(document).ready(function() {
 						if(val.length > 255) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
 						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
 						break;
-	    		    case 'mz007':
-						skey = 'Distrito';
-						if(val.length > 50) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
-						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+	    		    case 'mz006':
+						skey = 'Província selecionada';
+						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
+	    		    case 'mz007_n':
+						skey = 'Distrito selecionado';
+						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
 						break;
 	    		    case 'mz008':
 						skey = 'Posto Administrativo';
@@ -468,33 +495,21 @@ $(document).ready(function() {
 						if(val.length > 255) { send_err_msg_a.push(skey+' longo \n('+val+')'); form_check =0; }
 						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
 						break;
-	    		    case 'mz006':
-						skey = 'Província';
-						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
-						break;
 	    		    case 'mz012':
-						skey = 'Tipo de unidade';
+						skey = 'Tipo de unidade selecionada';
 						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
 						break;
 	    		    case 'mz013':
-						skey = 'Autoridade gestora';
+						skey = 'Autoridade gestora selecionada';
 						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
 						break;
 	    		    case 'mz014':
-						skey = 'Ministério de tutela';
+						skey = 'Ministério de tutela selecionado';
 						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
 						break;
 	    		    case 'mz015':
-						skey = 'Estado operacional';
+						skey = 'Estado operacional selecionado';
 						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
-						break;
-	    		    case 'mz023': 
-						skey = 'Tipos de serviços prestados';
-						if(val < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
-						break;
-	    		    case 'mz022':
-						skey = 'Consultas externas apenas';
-						if(val > 1 || val < 0) { send_err_msg_a.push('Falta '+skey); form_check =0; }
 						break;
 	    		    case 'mz016':
 						skey = 'Data de construção';
@@ -516,6 +531,10 @@ $(document).ready(function() {
 						skey = 'Data alteração de dados da Unidade de Saúde';
 						if(! valid(val)) { send_err_msg_a.push('Falta '+skey); form_check =0; }
 						break;
+	    		    case 'mz022':
+						skey = 'Consultas externas apenas';
+						if(val > 1 || val < 0) { send_err_msg_a.push('Falta '+skey); form_check =0; }
+						break;
 	    		    case 'mz023_c':
 						skey = 'Tipos de serviços prestados';
 						if(val.length < 1) { send_err_msg_a.push('Falta '+skey); form_check =0; }
@@ -534,6 +553,12 @@ $(document).ready(function() {
 						break;
 				}
 				data.push(key+'='+val);
+
+				// special cases
+				if ( mz003_n == 0 && mz003.length < 1 ) {
+					send_err_msg_a.push('Falta a unidade de saúde'+skey);
+					form_check =0;
+				}
 			});
 			if (form_check == 0) {
 				alert(send_err_msg_a.join('\n')+'\n\nCorrigir os erros acima.');
@@ -542,6 +567,16 @@ $(document).ready(function() {
 				return false;
 			}
 			var datastring = '?' + data.join('&');
+
+// debug
+/*
+				data.push(key+'='+val);
+			if ( ! window.confirm('send\n'+datastring) ) { 
+				app.WriteFile(f_debug,data.join('\n'),"utf-8");
+				return false; 
+			}
+*/
+
     		$.ajax({
 				url: url + datastring,
 				type: 'GET',
@@ -646,12 +681,19 @@ $(document).ready(function() {
 				var	rows = $(xml).children().find('row');
 				var field;
 				var value;
+				$('.mz00673').show();
 				rows.each(function(ind,ele){
 					field = $(ele).find('id').text();
 					value = $(ele).find('value').text();
 					switch (field) {
+						case 'mz003_n': // select unidade de saúde
+							us2select(f_tables, 0, 0, '#mz003_n', value);
+							break;
 						case 'mz006': // select províncias
-							$('#'+field).find('option[value= "'+value+'"]').attr('selected',true);
+							prov2select(f_tables, '#mz006', value);
+							break;
+						case 'mz007_n': // select distritos
+							dist2select(f_tables, 0, '#mz007_n', value);
 							break;
 						case 'mz012': // select
 							inject_sel(fileTabsXml, 'unit_type', field, value);
@@ -676,6 +718,7 @@ $(document).ready(function() {
 					}
 				});
 			} else {
+				prov2select(f_tables, '#mz006', 0);
 				inject_sel(fileTabsXml, 'unit_type', 'mz012',1);
 				inject_sel(fileTabsXml, 'unit_authority', 'mz013',1);
 				inject_sel(fileTabsXml, 'ministries', 'mz014',1);
@@ -703,6 +746,74 @@ $(document).ready(function() {
 			if ( ! is_fileUser ) { user_form = 0; }
 			return user_form;
 		}
+		//------------------------------------------------
+		function prov2select(urltree, id_select, toselect) {
+			var optv = '<option value="';
+			var opte = '</option>';
+			var opse = '" selected="selected">';
+			var xml_string = app.ReadFile(urltree);
+			var xml = $.parseXML(xml_string);
+			var	provs = $(xml).find('prov');
+			provs.each(function(ind,ele){
+				var rid = $(ele).attr('id');
+				var rna = $(ele).attr('name');
+				if (parseInt(toselect) > 0 && parseInt(toselect) == parseInt(rid)) {
+					$(id_select).append( optv + rid + opse + rna + opte );
+				} else {
+					$(id_select).append( optv + rid + '">' + rna + opte );
+				}
+			});
+		}
+		//------------------------------------------------
+		function dist2select(urltree, id_prov, id_select, toselect) {
+			var optv = '<option value="';
+			var opte = '</option>';
+			var opse = '" selected="selected">';
+			var xml_string = app.ReadFile(urltree);
+			var xml = $.parseXML(xml_string);
+			if (parseInt(toselect) > 0) {
+				var dist = $(xml).find('dist[id="'+toselect+'"]');
+				var prov = dist.parent();
+			} else {
+				var	prov = $(xml).find('prov[id="'+id_prov+'"]');
+			}
+			var	dists = $(prov).children();
+			dists.each(function(ind,ele){
+				var rid = $(ele).attr('id');
+				var rna = $(ele).attr('name');
+				if (parseInt(toselect) > 0 && parseInt(toselect) == parseInt(rid)) {
+					$(id_select).append( optv + rid + opse + rna + opte );
+				} else {
+					$(id_select).append( optv + rid + '">' + rna + opte );
+				}
+			});
+		}
+		//------------------------------------------------
+		function us2select(urltree, id_prov, id_dist, id_select, toselect) {
+			var optv = '<option value="';
+			var opte = '</option>';
+			var opse = '" selected="selected">';
+			var xml_string = app.ReadFile(urltree);
+			var xml = $.parseXML(xml_string);
+			if (parseInt(toselect) > 0) {
+				var	dist = $(xml).find('us[id="'+toselect+'"]').parent();
+			} else {
+				var	prov = $(xml).find('prov[id="'+id_prov+'"]');
+				var	dist = $(prov).find('dist[id="'+id_dist+'"]');
+			}
+			var	uss = $(dist).children();
+			uss.each(function(ind,ele){
+				var rid = $(ele).attr('id');
+				var rna = $(ele).attr('name');
+				if (parseInt(toselect) > 0 && parseInt(toselect) == parseInt(rid)) {
+					$(id_select).append( optv + rid + opse + rna + opte );
+				} else {
+					$(id_select).append( optv + rid + '">' + rna + opte );
+				}
+			});
+			$(id_select).append( optv + '0">A unidade não está na lista' + opte );
+		}
+		//------------------------------------------------
 		//------------------------------------------------
 		//------------------------------------------------
 		//------------------------------------------------

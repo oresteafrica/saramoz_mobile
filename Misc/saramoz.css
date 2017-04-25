@@ -125,7 +125,11 @@ input[type=checkbox] {
 #form_elements_05 > table > tbody > tr > td > input {
 }
 #form_elements_05 > table > tbody > tr > td > select {
-    font-size:x-small;
+	float:left;
+	height:40px;
+	margin-top:12px;
+	margin-right:8px;
+    font-size:small;
 }
 #form_page table:nth-of-type(2) > tbody > tr > td > input {
     width:40px;
@@ -136,8 +140,15 @@ input[type=checkbox] {
 	width:30%;
 	height:100px;
 }
-
-
+.mz00673 {
+	width:200px;
+}
+#mz007_n, #mz003_n {
+	display:none;
+}
+.mz003_row_input {
+	display:none;
+}
 /* end form page ------------------------------------------------------------------------------- */
 
 

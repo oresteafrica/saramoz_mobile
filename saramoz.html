@@ -155,11 +155,43 @@
                     <td colspan="2"><input type="text" id="mz001" maxlength="16" size="16" pattern=".{3,16}"></td>
                 </tr>
                 <tr>
-                    <td>MZ003</td>
-                    <td>Nome da unidade</td>
+                    <td>MZ006</td>
+                    <td>Província</td>
                 </tr>
                 <tr>
-                    <td colspan="2"><input type="text" id="mz003" maxlength="255"></td>
+                    <td colspan="2">
+						<select id="mz006" class="mz00673">
+							<option value="0" select="selected">Escolhe a província</option>
+						</select>
+					</td>
+                </tr>
+
+                <tr>
+                    <td>MZ007</td>
+                    <td>Distrito</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+						<select id="mz007_n" class="mz00673"></select>
+					</td>
+                </tr>
+                <tr class="mz003_row_select">
+                    <td>MZ003</td>
+                    <td>Escolhe a unidade</td>
+                </tr>
+                <tr class="mz003_row_select">
+                    <td colspan="2">
+						<select id="mz003_n" class="mz00673"></select>
+					</td>
+                </tr>
+                <tr class="mz003_row_input">
+                    <td>MZ003</td>
+                    <td>Nome da unidade <button id="bu_mz003_3">Lista</button> </td>
+                </tr>
+                <tr class="mz003_row_input">
+                    <td colspan="2">
+						<input type="text" id="mz003" maxlength="255">
+					</td>
                 </tr>
                 <tr>
                     <td>MZ004</td>
@@ -174,34 +206,6 @@
                 </tr>
                 <tr>
                     <td colspan="2"><input type="text" id="mz005" maxlength="255"></td>
-                </tr>
-                <tr>
-                    <td>MZ006</td>
-                    <td>Província</td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-						<select id="mz006">
-							<option value="2">Niassa</option>
-							<option value="3">Cabo Delgado</option>
-							<option value="4">Nampula</option>
-							<option value="5">Tete</option>
-							<option value="6">Zambezia</option>
-							<option value="7">Manica</option>
-							<option value="8">Sofala</option>
-							<option value="9">Gaza</option>
-							<option value="10">Inhambane</option>
-							<option value="11">Maputo cidade</option>
-							<option value="12">Maputo</option>
-						</select>
-					</td>
-                </tr>
-                <tr>
-                    <td>MZ007</td>
-                    <td>Distrito</td>
-                </tr>
-                <tr>
-                    <td colspan="2"><input type="text" id="mz007" maxlength="50" pattern=".{3,50}"></td>
                 </tr>
                 <tr>
                     <td>MZ008</td>
@@ -634,7 +638,30 @@
                     <td><input type="number" step="1" min="0" value="" id="mz200_16_00_TP_EM"></td>
                     <td><input type="number" step="1" min="0" value="" id="mz200_16_00_TP_EF"></td>
                 <tr>
-                    <td>Profissionais de saúde de nível médio</td>
+                 <tr style="text-align:center;font-weight:bold;">
+                    <td style="border:0;"></td>
+                    <td colspan="4">Funcionários, agentes do estado e contratados a tempo inteiro</td>
+                    <td colspan="4">Funcionários, agentes do estado e contratados a tempo parcial</td>
+                </tr>
+                <tr style="text-align:center;font-weight:bold;">
+                    <td style="border:0;"></td>
+                    <td colspan="2">Nacional</td>
+                    <td colspan="2">Estrangeiro</td>
+                    <td colspan="2">Nacional</td>
+                    <td colspan="2">Estrangeiro</td>
+                </tr>
+                <tr style="text-align:center;font-weight:bold;">
+                    <td style="border:0;"></td>
+                    <td>M</td>
+                    <td>F</td>
+                    <td>M</td>
+                    <td>F</td>
+                    <td>M</td>
+                    <td>F</td>
+                    <td>M</td>
+                    <td>F</td>
+                </tr>
+                   <td>Profissionais de saúde de nível médio</td>
                     <td style="border:0;"></td>
                     <td style="border:0;"></td>
                     <td style="border:0;"></td>
@@ -954,6 +981,29 @@
                     <td><input type="number" step="1" min="0" value="" id="mz200_47_00_TP_EM"></td>
                     <td><input type="number" step="1" min="0" value="" id="mz200_47_00_TP_EF"></td>
                 <tr>
+                <tr style="text-align:center;font-weight:bold;">
+                    <td style="border:0;"></td>
+                    <td colspan="4">Funcionários, agentes do estado e contratados a tempo inteiro</td>
+                    <td colspan="4">Funcionários, agentes do estado e contratados a tempo parcial</td>
+                </tr>
+                <tr style="text-align:center;font-weight:bold;">
+                    <td style="border:0;"></td>
+                    <td colspan="2">Nacional</td>
+                    <td colspan="2">Estrangeiro</td>
+                    <td colspan="2">Nacional</td>
+                    <td colspan="2">Estrangeiro</td>
+                </tr>
+                <tr style="text-align:center;font-weight:bold;">
+                    <td style="border:0;"></td>
+                    <td>M</td>
+                    <td>F</td>
+                    <td>M</td>
+                    <td>F</td>
+                    <td>M</td>
+                    <td>F</td>
+                    <td>M</td>
+                    <td>F</td>
+                </tr>
                     <td>Agentes elementares</td>
                     <td style="border:0;"></td>
                     <td style="border:0;"></td>
@@ -1015,7 +1065,7 @@
 
 <div id="debug_sara"
     style="width:100%;margin-top:20px;float:left;text-align:center;font-size:x-small;">
-    Versão 1.1
+    Versão 1.1 (20/4/2017)
 </div>
 
 </body>
